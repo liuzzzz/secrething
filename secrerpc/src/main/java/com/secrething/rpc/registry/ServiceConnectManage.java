@@ -1,5 +1,6 @@
 package com.secrething.rpc.registry;
 
+import com.secrething.common.contants.Constant;
 import com.secrething.rpc.client.ClientHandler;
 import com.secrething.rpc.client.ClientInitializer;
 import io.netty.bootstrap.Bootstrap;

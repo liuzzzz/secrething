@@ -4,7 +4,7 @@ import com.secrething.common.util.MD5Util;
 import com.secrething.rpc.annotation.RPCProvidor;
 import com.secrething.rpc.protocol.ProtocolDecoder;
 import com.secrething.rpc.protocol.ProtocolEncoder;
-import com.secrething.rpc.registry.Constant;
+import com.secrething.common.contants.Constant;
 import com.secrething.rpc.registry.ServiceRegistry;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;

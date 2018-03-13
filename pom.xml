@@ -10,6 +10,8 @@
         <module>common</module>
         <module>spring-lib</module>
         <module>secrerpc</module>
+        <module>TestUtil</module>
+        <module>protocol</module>
     </modules>
     <packaging>pom</packaging>
     <properties>

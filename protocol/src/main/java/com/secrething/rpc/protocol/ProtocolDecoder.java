@@ -1,6 +1,6 @@
 package com.secrething.rpc.protocol;
 
-import com.secrething.rpc.registry.Constant;
+import com.secrething.common.contants.Constant;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;

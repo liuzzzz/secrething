@@ -1,7 +1,7 @@
 package com.secrething.rpc.protocol;
 
 
-import com.secrething.rpc.registry.Constant;
+import com.secrething.common.contants.Constant;
 
 /**
  * Created by liuzengzeng on 2017/12/11.

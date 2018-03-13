@@ -1,4 +1,4 @@
-package com.secrething.rpc.registry;
+package com.secrething.common.contants;
 
 /**
  *
