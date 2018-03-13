@@ -12,4 +12,5 @@ public interface Constant {
     boolean IS_LINUX = System.getProperty("os.name").equals("Linux");
     String ZK_REGISTRY_PATH = "/registry";
     String ZK_DATA_PATH = ZK_REGISTRY_PATH + "/data";
+
 }
