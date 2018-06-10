@@ -8,6 +8,7 @@ public class RemoteResponse {
     private String requestId;
     private String error;
     private Object result;
+    private Throwable throwable;
 
     public boolean isError() {
         return error != null;
@@ -35,6 +36,14 @@ public class RemoteResponse {
 
     public void setResult(Object result) {
         this.result = result;
+    }
+
+    public Throwable getThrowable() {
+        return throwable;
+    }
+
+    public void setThrowable(Throwable throwable) {
+        this.throwable = throwable;
     }
 
     public static RemoteResponse defail(String requestId, String error) {

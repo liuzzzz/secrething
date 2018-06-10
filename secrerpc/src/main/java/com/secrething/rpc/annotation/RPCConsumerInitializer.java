@@ -36,7 +36,7 @@ public class RPCConsumerInitializer implements BeanPostProcessor, InitializingBe
                     fieldBeanName = field.getName();
                 }
                 try {
-                    field.set(bean, RemoteServiceFactory.getProxyInstance(clzz, MD5Util.getOneInstance().md5Gen16B(fieldBeanName)));
+                    field.set(bean, RemoteServiceFactory.getProxyInstance(clzz, fieldBeanName));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }

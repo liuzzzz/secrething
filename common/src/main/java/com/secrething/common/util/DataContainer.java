@@ -2,87 +2,222 @@ package com.secrething.common.util;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.cache.CacheBuilder;
+import com.secrething.common.util.GuavaCacheBuilder;
+import com.secrething.common.util.GuavaCacheFactory;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Created by liuzengzeng on 2017/12/6.
+ * 基于map实现的一种多叉树 数据结构
+ * 提供线程安全和不安全两种方式
+ * 多加了一种guava的失效方式
+ * 示例:
+ * <pre>
+ * put(data,a,b,c)
+ * put(data,a,x,c)
+ * {
+ *  "nodes":{
+ *      "a":{
+ *          "nodes":{
+ *                  "b":{
+ *                      "nodes":{
+ *                              "c":{
+ *                                  "data":"data"
+ *                               }
+ *                      }
+ *                  },
+ *                  "x":{
+ *                      "nodes":{
+ *                              "c":{
+ *                                  "data":"data"
+ *                               }
+ *                      }
+ *                  }
+ *          }
+ *      }
+ *  }
+ * }
+ * </pre>
  */
 public class DataContainer<K, D> {
+    public static final byte NOMAL = 1;
+    public static final byte CONCURRENT = 2;
+    public static final byte GUAVA = 3;
+    private final Map<K, DataContainer<K, D>> children;
+    private final GuavaCacheBuilder<K, DataContainer<K, D>> cacheBuilder;
+    private final byte type;
+    private final Sync sync;
     private D data;
-    private Map<K, DataContainer<K, D>> children;
-    private final boolean concurrent;
-    private Sync sync;
 
-    private DataContainer(boolean concurrent) {
-        this.concurrent = concurrent;
-        if (concurrent)
-            this.sync = new RealLock();
-        else
-            this.sync = new Sync() {};
-        check();
-    }
-
-    private DataContainer(boolean concurrent, D data) {
-        this.concurrent = concurrent;
+    private DataContainer(byte type, D data, GuavaCacheBuilder<K, DataContainer<K, D>> cacheBuilder) {
+        MapAndSync<K, D> mapAndSync = new MapAndSync(type, cacheBuilder).invoke();
+        this.children = mapAndSync.getMap();
+        this.sync = mapAndSync.getSync();
+        this.cacheBuilder = cacheBuilder;
+        this.type = type;
         this.data = data;
+
+    }
+
+    private DataContainer() {
+        this(NOMAL, null, null);
+
     }
 
 
-    private final static <K, D> DataContainer<K, D> createChild(boolean concurrent, D data) {
-        DataContainer<K, D> node = new DataContainer<>(concurrent, data);
-        return node;
+    private DataContainer(byte type) {
+        this(type, null, null);
+
     }
 
-    private final static <K, D> DataContainer<K, D> createParent(boolean concurrent) {
-        return new DataContainer<K, D>(concurrent);
-    }
-
-
-    public final D getData() {
-        return data;
-    }
-
-    public final Map<K, DataContainer<K, D>> getNodes() {
-        return children;
+    private final static boolean isSupport(byte type, CacheBuilder cacheBuilder) {
+        return NOMAL == type || CONCURRENT == type || (GUAVA == type && null != cacheBuilder);
     }
 
     public final static <K, D> DataContainer<K, D> createInstance() {
-        return new DataContainer<K, D>(false);
+
+        return new DataContainer<K, D>(NOMAL, null, null);
     }
 
     public final static <K, D> DataContainer<K, D> createConcurrentInstance() {
-        return new DataContainer<K, D>(true);
+        return new DataContainer<K, D>(CONCURRENT, null, null);
     }
 
-    public final DataContainer<K, D> getNode(K... keys) {
+    public final static <K, D> DataContainer<K, D> createAutoExpireInstance(GuavaCacheBuilder cacheBuilder) {
+        return new DataContainer<K, D>(GUAVA, null, cacheBuilder);
+    }
+
+    public final static <K, D> DataContainer<K, D> createAutoExpireInstance(long maxSize, long expireAfterWrite, TimeUnit afterWriteUnit, long expireAfterAccess, TimeUnit afterAccessUnit) {
+        GuavaCacheBuilder<K, DataContainer<K, D>> builder = GuavaCacheFactory.generatorBuilder(maxSize, expireAfterWrite, afterWriteUnit, expireAfterAccess, afterAccessUnit);
+        return new DataContainer<K, D>(GUAVA, null, builder);
+    }
+
+    static Sync lock() {
+        return new RealLock();
+    }
+
+    static Sync unlock() {
+        return new Sync() {
+            @Override
+            public void locakRead() {
+
+            }
+
+            @Override
+            public void unlockRead() {
+
+            }
+
+            @Override
+            public void lockWrite() {
+
+            }
+
+            @Override
+            public void unlockWrite() {
+
+            }
+        };
+    }
+
+    public static void main(String[] args) {
+        DataContainer<String, String> dataContainer = new DataContainer<>();
+        dataContainer.put("1", "a", "b", "a");
+        dataContainer.put("1", "a", "b", "c");
+        dataContainer.put("1", "a", "b", "d");
+        dataContainer.put("1", "a", "c", "e");
+        dataContainer.put("1", "a", "c", "e");
+        String s = JSONObject.toJSONString(dataContainer);
+        System.out.println(s);
+        DataContainer dataConta = JSONObject.parseObject(s, DataContainer.class);
+        System.out.println(dataConta);
+    }
+
+    private final DataContainer<K, D> createChild(D data) {
+        DataContainer<K, D> node = new DataContainer<>(this.type, data, this.cacheBuilder);
+        return node;
+    }
+
+    private final DataContainer<K, D> createParent() {
+        return new DataContainer<K, D>(this.type, null, this.cacheBuilder);
+    }
+
+    public final D getData() {
+        return lockRead(new Handler<D>() {
+            @Override
+            public D readOrWrite() {
+                return data;
+            }
+        });
+
+    }
+
+    public void setData(D data) {
+        this.data = data;
+    }
+
+    <T> T lockRead(Handler<T> handler) {
+        sync.locakRead();
+        try {
+            return handler.readOrWrite();
+        } finally {
+            sync.unlockRead();
+        }
+    }
+
+    <T> T lockWrite(Handler<T> handler) {
+        sync.lockWrite();
+        try {
+            return handler.readOrWrite();
+        } finally {
+            sync.unlockWrite();
+        }
+    }
+
+    public final Map<K, DataContainer<K, D>> getNodes() {
+        return lockRead(new Handler<Map<K, DataContainer<K, D>>>() {
+            @Override
+            public Map<K, DataContainer<K, D>> readOrWrite() {
+                return children;
+            }
+        });
+    }
+
+    public final DataContainer<K, D> getNode(final Object... keys) {
+        final DataContainer<K, D> root = this;
         if (keysCantGet(keys))
             return null;
         if (keys.length == 1)
-            try {
-                sync.lockToRead();
-                return this.children.get(keys[0]);
-            } finally {
-                sync.unlockToRead();
-            }
-        K key = keys[keys.length - 1];
-        K[] parentKeys = Arrays.copyOf(keys, keys.length - 1);
+            return lockRead(new Handler<DataContainer<K, D>>() {
+                @Override
+                public DataContainer<K, D> readOrWrite() {
+                    DataContainer<K, D> chd = children.get(keys[0]);
+                    if (null == chd)
+                        return root.copy();
+                    return chd;
+                }
+            });
+        Object key = keys[keys.length - 1];
+        Object[] parentKeys = Arrays.copyOf(keys, keys.length - 1);
         return getNodeSplitKey(key, parentKeys);
 
     }
 
-    public final D getNodeData(K... keys) {
+    public final D getNodeData(Object... keys) {
         if (keysCantGet(keys))
             return null;
         if (keys.length == 1)
             return getNodeDataSplitKey(keys[0]);
         int newlen = keys.length - 1;
-        K key = selectKey(newlen, keys);
-        K[] parentKeys = selectParentKeys(newlen, keys);
+        Object key = selectKey(newlen, keys);
+        Object[] parentKeys = selectParentKeys(newlen, keys);
         return getNodeDataSplitKey(key, parentKeys);
 
     }
@@ -95,38 +230,63 @@ public class DataContainer<K, D> {
             return;
         }
         int newlen = keys.length - 1;
-        K key = selectKey(newlen, keys);
-        K[] parentKeys = selectParentKeys(newlen, keys);
+        K key = (K)selectKey(newlen, keys);
+        K[] parentKeys = (K[]) selectParentKeys(newlen, keys);
         putSplitKey(key, data, parentKeys);
 
     }
 
-    private K selectKey(int index, K... keys) {
+    public final void putNode(final DataContainer<K, D> node, K... keys) {
+        if (keysCantPut(keys))
+            return;
+        if (keys.length == 1) {
+            this.getNodes().put(keys[0], node);
+        } else {
+            int newlen = keys.length - 1;
+            final K key = (K)selectKey(newlen, keys);
+            final K[] parentKeys = (K[]) selectParentKeys(newlen, keys);
+            lockWrite(new Handler<Void>() {
+                @Override
+                public Void readOrWrite() {
+                    putBase(key, node, parentKeys);
+                    return null;
+                }
+            });
+        }
+
+
+    }
+
+    private Object selectKey(int index, Object... keys) {
         return keys[index];
     }
 
-    private K[] selectParentKeys(int len, K... keys) {
-        K[] parentKeys = (K[]) Array.newInstance(keys[0].getClass(), len);
+    private Object[] selectParentKeys(int len, Object... keys) {
+        Object[] parentKeys = new Object[len];
         System.arraycopy(keys, 0, parentKeys, 0, len);
         return parentKeys;
     }
 
-    public final DataContainer<K, D> remove(K... keys) {
+    public final DataContainer<K, D> remove(final Object... keys) {
         if (null == keys || keys.length < 1 || null == children)
             return null;
         else if (keys.length == 1) {
-            return this.children.remove(keys[0]);
+            return lockWrite(new Handler<DataContainer<K, D>>() {
+                @Override
+                public DataContainer<K, D> readOrWrite() {
+                    return children.remove(keys[0]);
+                }
+            });
         }
-        K[] parent = selectParentKeys(keys.length - 1, keys);
-        DataContainer<K, D> node = getNode(parent);
-        return node == null ? null : node.children.remove(keys[keys.length - 1]);
+        Object[] parent = selectParentKeys(keys.length - 1, keys);
+        final DataContainer<K, D> node = getNode(parent);
+        return lockWrite(new Handler<DataContainer<K, D>>() {
+            @Override
+            public DataContainer<K, D> readOrWrite() {
+                return node == null ? null : node.children.remove(keys[keys.length - 1]);
+            }
+        });
 
-    }
-
-    private void check() {
-        if (null != this.children)
-            return;
-        this.children = new HashMap<K, DataContainer<K, D>>();
     }
 
     private void putBase(K key, DataContainer<K, D> node, K... parentKeys) {
@@ -134,13 +294,12 @@ public class DataContainer<K, D> {
             throw new NullPointerException("key or node can't be null");
 
         DataContainer<K, D> next = this;
-        next.check();
         if (null != parentKeys && parentKeys.length > 0) {
             for (int i = 0; i < parentKeys.length; i++) {
                 K parentKey = parentKeys[i];
                 DataContainer curr = next.children.get(parentKey);
                 if (null == curr) {
-                    curr = createParent(next.concurrent);
+                    curr = next.createParent();
                     next.children.put(parentKey, curr);
                 }
                 next = curr;
@@ -150,7 +309,12 @@ public class DataContainer<K, D> {
     }
 
     private boolean hasChildren() {
-        return null != this.children && !this.children.isEmpty();
+        return lockRead(new Handler<Boolean>() {
+            @Override
+            public Boolean readOrWrite() {
+                return null != children && !children.isEmpty();
+            }
+        });
     }
 
     /**
@@ -161,7 +325,7 @@ public class DataContainer<K, D> {
      * @return Node
      */
 
-    private DataContainer<K, D> findNode(K... parentKeys) {
+    private DataContainer<K, D> findNode(Object... parentKeys) {
         if (!hasChildren())
             return this;
         DataContainer<K, D> next = this;
@@ -179,87 +343,152 @@ public class DataContainer<K, D> {
 
     }
 
-    private void putSplitKey(K key, D data, K... parentKeys) {
-        try {
-            sync.lockToWrite();
-            DataContainer<K, D> node = createChild(this.concurrent, data);
-            putBase(key, node, parentKeys);
-        } finally {
-            sync.unlockToWrite();
-        }
-
-    }
-
-
-    private DataContainer<K, D> getNodeSplitKey(K key, K... parentKeys) {
-        try {
-            sync.lockToRead();
-            if (null != parentKeys && parentKeys.length > 0) {
-                DataContainer<K, D> node = findNode(parentKeys); //循环方式
-                if (null == node || null == node.children)
-                    return null;
-                return node.children.get(key);
+    private void putSplitKey(final K key, final D data, final K... parentKeys) {
+        final DataContainer<K, D> curr = this;
+        lockWrite(new Handler<Void>() {
+            @Override
+            public Void readOrWrite() {
+                DataContainer<K, D> node = curr.createChild(data);
+                putBase(key, node, parentKeys);
+                return null;
             }
-            return children.get(key);
-        } finally {
-            sync.unlockToRead();
-        }
-
-
+        });
     }
 
-    private D getNodeDataSplitKey(K key, K... parentKeys) {
-        DataContainer<K, D> node = getNodeSplitKey(key, parentKeys);
-        if (null == node)
-            return null;
-        return node.getData();
+    public DataContainer<K, D> copy() {
+        return new DataContainer<>(this.type, this.data, this.cacheBuilder);
     }
 
-    private boolean keysCantPut(K... keys) {
+    private DataContainer<K, D> getNodeSplitKey(final Object key, final Object... parentKeys) {
+        final DataContainer<K, D> root = this;
+        return lockRead(new Handler<DataContainer<K, D>>() {
+            @Override
+            public DataContainer<K, D> readOrWrite() {
+                if (null != parentKeys && parentKeys.length > 0) {
+                    DataContainer<K, D> node = findNode(parentKeys); //循环方式
+                    if (null == node || null == node.children)
+                        return root.copy();
+                    DataContainer<K, D> chd = node.children.get(key);
+                    if (null == chd)
+                        return root.copy();
+                    return chd;
+                }
+                DataContainer<K, D> chd = children.get(key);
+                if (null == chd)
+                    return root.copy();
+                return chd;
+            }
+        });
+    }
+
+    private D getNodeDataSplitKey(final Object key, final Object... parentKeys) {
+        return lockRead(new Handler<D>() {
+            @Override
+            public D readOrWrite() {
+                DataContainer<K, D> node = getNodeSplitKey(key, parentKeys);
+                if (null == node)
+                    return null;
+                return node.getData();
+            }
+        });
+    }
+
+    private boolean keysCantPut(Object... keys) {
         return null == keys || keys.length < 1;
     }
 
-    private boolean keysCantGet(K... keys) {
+    private boolean keysCantGet(Object... keys) {
         return keysCantPut(keys) || null == this.children;
     }
 
-    interface Sync {
-        default void lockToRead(){return;}
-
-        default void unlockToRead(){return;}
-
-        default void lockToWrite(){return;}
-
-        default void unlockToWrite(){return;}
-    }
-
-    static class RealLock extends ReentrantReadWriteLock implements Sync {
-        ReadLock readLock = readLock();
-        WriteLock writeLock = writeLock();
-
-        @Override
-        public void lockToRead() {
-            readLock.lock();
-        }
-
-        @Override
-        public void unlockToRead() {
-            readLock.unlock();
-        }
-
-        @Override
-        public void lockToWrite() {
-            writeLock.lock();
-        }
-
-        @Override
-        public void unlockToWrite() {
-            writeLock.unlock();
-        }
-    }
     @Override
     public String toString() {
         return JSONObject.toJSONString(this);
     }
 
+    static interface Handler<T> {
+        T readOrWrite();
+    }
+
+    static interface Sync {
+        void locakRead();
+
+        void unlockRead();
+
+        void lockWrite();
+
+        void unlockWrite();
+    }
+
+    private static class RealLock extends ReentrantReadWriteLock implements Sync {
+        ReadLock readLock = readLock();
+        WriteLock writeLock = writeLock();
+
+        @Override
+        public void locakRead() {
+            readLock.lock();
+        }
+
+        @Override
+        public void unlockRead() {
+            readLock.unlock();
+        }
+
+        @Override
+        public void lockWrite() {
+            writeLock.lock();
+        }
+
+        @Override
+        public void unlockWrite() {
+            writeLock.unlock();
+        }
+    }
+
+    private static class MapAndSync<K, D> {
+        private byte type;
+        private GuavaCacheBuilder<K, DataContainer<K, D>> cacheBuilder;
+        private Map<K, DataContainer<K, D>> map;
+        private Sync sync;
+
+        public MapAndSync(byte type, GuavaCacheBuilder<K, DataContainer<K, D>> cacheBuilder) {
+            this.type = type;
+            this.cacheBuilder = cacheBuilder;
+        }
+
+        public Map<K, DataContainer<K, D>> getMap() {
+            return map;
+        }
+
+        public Sync getSync() {
+            return sync;
+        }
+
+        public MapAndSync<K, D> invoke() {
+            switch (type) {
+                case GUAVA: {
+                    Assert.notNull(cacheBuilder, "heihei not support");
+                    map = cacheBuilder.build().asMap();
+                    sync = lock();
+                    break;
+                }
+                case NOMAL: {
+                    Assert.isTrue(cacheBuilder == null, "heihei not support");
+                    map = new HashMap<>();
+                    sync = unlock();
+                    break;
+                }
+                case CONCURRENT: {
+                    Assert.isTrue(cacheBuilder == null, "heihei not support");
+                    map = new HashMap<>();
+                    sync = lock();
+                    break;
+                }
+                default: {
+                    throw new IllegalArgumentException("heihei type not support");
+                }
+            }
+            return this;
+        }
+    }
 }

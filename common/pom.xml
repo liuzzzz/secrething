@@ -59,7 +59,7 @@
             <artifactId>fst</artifactId>
         </dependency>-->
     </dependencies>
-    <build>
+    <!--<build>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -76,5 +76,5 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>
+    </build>-->
 </project>

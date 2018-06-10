@@ -3,6 +3,7 @@ package com.secrething.common.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -46,6 +47,14 @@ public class Latch {
             logger.error("notify fail ", e);
         } finally {
             latch.unlock();
+        }
+    }
+
+    public static void main(String[] args) {
+        Class<Latch> clzz = Latch.class;
+        Method[] methods = clzz.getDeclaredMethods();
+        for (Method m:methods) {
+            System.out.println(m.getName());
         }
     }
 }

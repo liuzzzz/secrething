@@ -1,9 +1,11 @@
 package com.secrething.rpc.server;
 
+import com.secrething.common.util.DataContainer;
 import com.secrething.common.util.SerializeUtil;
 import com.secrething.rpc.core.RemoteRequest;
 import com.secrething.rpc.core.RemoteResponse;
 import com.secrething.rpc.protocol.MessageProtocol;
+import com.secrething.rpc.proxy.ProxyOperation;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -18,9 +20,9 @@ import java.util.Map;
  * Server通信handler
  */
 public class ServerSocketHandler extends SimpleChannelInboundHandler<MessageProtocol> {
-    private final Map<String, Object> handlerMap;
+    private final DataContainer<String, ProxyOperation> handlerMap;
 
-    public ServerSocketHandler(Map<String, Object> handlerMap) {
+    public ServerSocketHandler(DataContainer<String, ProxyOperation> handlerMap) {
         this.handlerMap = handlerMap;
     }
 
@@ -36,7 +38,7 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<MessageProt
                     Object result = handle(request);
                     response.setResult(result);
                 } catch (Throwable e) {
-                    response.setError(e.toString());
+                    response.setThrowable(e);
                 }
                 byte[] data = SerializeUtil.serialize(response);
                 MessageProtocol out = new MessageProtocol(data.length,data);
@@ -57,13 +59,9 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<MessageProt
 
     private Object handle(RemoteRequest request) throws Throwable {
         String beanName = request.getBeanName();
-        Object serviceBean = handlerMap.get(beanName);
-        Class<?> serviceClass = serviceBean.getClass();
         String methodName = request.getMethodName();
-        Class<?>[] parameterTypes = request.getParameterTypes();
         Object[] parameters = request.getParameters();
-        FastClass serviceFastClass = FastClass.create(serviceClass);
-        FastMethod serviceFastMethod = serviceFastClass.getMethod(methodName, parameterTypes);
-        return serviceFastMethod.invoke(serviceBean, parameters);
+        ProxyOperation operation = handlerMap.getNodeData(beanName,methodName);
+        return operation.invoke(parameters);//serviceFastMethod.invoke(serviceBean, parameters);
     }
 }

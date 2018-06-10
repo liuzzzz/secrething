@@ -55,7 +55,6 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     public RemoteFuture sendRequest(final RemoteRequest remoteRequest) throws InterruptedException {
-        final CountDownLatch latch = new CountDownLatch(1);
         final RemoteFuture future = new RemoteFuture(remoteRequest);
         logger.debug("netty client send request message begin");
         pendingCache.put(remoteRequest.getRequestId(), future);
@@ -69,12 +68,10 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
                     @Override
                     public void operationComplete(ChannelFuture future) throws Exception {
                         logger.debug("netty client send request message end");
-                        latch.countDown();
                     }
                 });
             }
         });
-        latch.await(30, TimeUnit.SECONDS);
         return future;
     }
 
