@@ -19,12 +19,13 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * 服务发现
  * Created by liuzengzeng on 2017/12/10.
+ * 或可用redis实现
  */
 public class ServiceDiscovery {
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceDiscovery.class);
 
-    private CountDownLatch latch = new CountDownLatch(1);
+
 
     private volatile List<String> dataList = new ArrayList<>();
 
@@ -59,6 +60,7 @@ public class ServiceDiscovery {
 
     private ZooKeeper connectServer() {
         ZooKeeper zk = null;
+        final CountDownLatch latch = new CountDownLatch(1);
         try {
             zk = new ZooKeeper(registryAddress, Constant.ZK_SESSION_TIMEOUT, new Watcher() {
                 @Override
