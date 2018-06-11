@@ -11,17 +11,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RemoteServiceFactory {
     public static <T> T getProxyInstance(Class<T> clzz,String beanName) {
-        Object instance = Inner.INSTANCE_CACHE.get(beanName);
-        if (null != instance)
-            return (T)instance;
         Enhancer enhancer = new Enhancer();
         enhancer.setInterfaces(new Class[]{clzz});
         enhancer.setCallback(new RemoteServiceProxy(beanName));
-        instance = enhancer.create();
+        Object instance = enhancer.create();
         return (T)instance;
     }
 
-    private static final class Inner {
-        private static final ConcurrentHashMap<String, Object> INSTANCE_CACHE = new ConcurrentHashMap<>();
-    }
 }
