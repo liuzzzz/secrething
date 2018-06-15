@@ -9,14 +9,14 @@ import com.dyuproject.protostuff.runtime.RuntimeSchema;
  */
 public class SerializeUtil {
 
-    public static <T> byte[] serialize(T t) {
+    public static byte[] serialize(Object t) {
         try {
 
             if (null == t) {
                 throw new NullPointerException();
             }
-            Class<T> clzz = (Class<T>) t.getClass();
-            RuntimeSchema<T> schema = RuntimeSchema.createFrom(clzz);
+            Class clzz =  t.getClass();
+            RuntimeSchema schema = RuntimeSchema.createFrom(clzz);
             byte[] bs = ProtostuffIOUtil.toByteArray(t, schema, LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE));
             return bs;
         } catch (Exception e) {

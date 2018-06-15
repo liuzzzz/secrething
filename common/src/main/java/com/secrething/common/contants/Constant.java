@@ -7,7 +7,7 @@ package com.secrething.common.contants;
  */
 public interface Constant {
 
-    int ZK_SESSION_TIMEOUT = 5000;
+    int ZK_SESSION_TIMEOUT = 50000;
     int HEAD_DATA = 3411234;
     boolean IS_LINUX = System.getProperty("os.name").equals("Linux");
     String ZK_REGISTRY_PATH = "/registry";

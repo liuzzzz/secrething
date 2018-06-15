@@ -24,6 +24,7 @@ public class ServerRegistryPostProcessor implements BeanDefinitionRegistryPostPr
 
     @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+        System.out.println("hello");
         registerBean(registry, "server", Server.class);
     }
 

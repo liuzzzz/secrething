@@ -7,7 +7,6 @@ import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
@@ -40,7 +39,7 @@ public class ServiceRegistry {
         if (data != null) {
             ZooKeeper zk = connectServer();
             if (zk != null) {
-                AddRootNode(zk); // Add root node if not exist
+                addRootNode(zk); // Add root node if not exist
                 createNode(zk, data);
             }
         }
@@ -66,7 +65,7 @@ public class ServiceRegistry {
         return zk;
     }
 
-    private void AddRootNode(ZooKeeper zk) {
+    private void addRootNode(ZooKeeper zk) {
         try {
             Stat s = zk.exists(Constant.ZK_REGISTRY_PATH, false);
             if (s == null) {

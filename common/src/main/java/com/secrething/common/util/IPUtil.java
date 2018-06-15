@@ -41,6 +41,7 @@ public class IPUtil {
                 try {
                     in.close();
                 } catch (IOException e) {
+                    //skip
                 }
             }
         }
@@ -48,6 +49,6 @@ public class IPUtil {
     }
 
     public static String getIPV4(){
-        return WEB_IP;
+        return "127.0.0.1";
     }
 }

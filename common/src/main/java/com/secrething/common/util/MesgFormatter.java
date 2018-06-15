@@ -23,11 +23,15 @@ public abstract class MesgFormatter {
      * @return
      */
     public static final String format(String pattern, Object... params) {
+        return formatWithHolder(pattern,PLACE_HOLDER,params);
+    }
+
+    public static final String formatWithHolder(String pattern, String hoder, Object... params) {
         if (params.length < 1 || StringUtils.isBlank(pattern))
             return pattern;
         char[] src = pattern.toCharArray();
         int offset = 0;
-        int idx = pattern.indexOf(PLACE_HOLDER, offset);
+        int idx = pattern.indexOf(hoder, offset);
         if (idx < 0)
             return pattern;
         StringBuilder builder = new StringBuilder();
@@ -37,11 +41,15 @@ public abstract class MesgFormatter {
                 builder.append(src, offset, len);
             builder.append(params[i]);
             offset = idx + split;
-            idx = pattern.indexOf(PLACE_HOLDER, offset);
+            idx = pattern.indexOf(hoder, offset);
         }
         if (offset < src.length) {
             builder.append(src, offset, src.length - offset);
         }
         return builder.toString();
+    }
+
+    public static final void println(String pattern, Object... params) {
+        System.out.println(format(pattern, params));
     }
 }

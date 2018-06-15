@@ -101,7 +101,7 @@ public class Server implements ApplicationContextAware, InitializingBean {
                     ChannelFuture future = bootstrap.bind(port).sync();
                     rootFuture = future;
                     if (serviceRegistry != null) {
-                        serviceRegistry.register(MesgFormatter.format("{}:{}", IPUtil.getIPV4(), port));
+                        serviceRegistry.register(MesgFormatter.format("{}:{}", "127.0.0.1", port));
                     }
                     logger.info("server bind success...");
                     downLatch.countDown();

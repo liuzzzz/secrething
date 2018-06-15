@@ -35,7 +35,7 @@ public class ServiceDiscovery {
     public ServiceDiscovery(CountDownLatch latch) {
         this.registryAddress = LoadProperties.getConfig("zookeeper.registry");
         if (StringUtils.isBlank(this.registryAddress))
-            this.registryAddress = "127.0.0.1:2881";
+            this.registryAddress = "127.0.0.1:2181";
         zookeeper = connectServer();
         if (zookeeper != null) {
             watchNode(zookeeper);
