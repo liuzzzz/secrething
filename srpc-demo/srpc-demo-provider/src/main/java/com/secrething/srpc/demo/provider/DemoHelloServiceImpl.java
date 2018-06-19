@@ -13,4 +13,9 @@ public class DemoHelloServiceImpl implements DemoHelloService {
     public String sayHello(String client) {
         return MesgFormatter.format("{}:{}, hello","provider",client);
     }
+
+    @Override
+    public String sayBye(String param) {
+        return MesgFormatter.format("{}:{}, bye!","provider",param);
+    }
 }

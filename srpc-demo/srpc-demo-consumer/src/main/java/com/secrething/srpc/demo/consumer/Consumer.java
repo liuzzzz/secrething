@@ -10,6 +10,7 @@ public class Consumer {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("srpc-demo-consumer.xml");
         context.start();
         HelloService helloService = context.getBean(HelloService.class);
+        System.out.println(helloService.sayBye("consumer-2"));
         System.out.println(helloService.sayHello("consumer-1"));
 
     }

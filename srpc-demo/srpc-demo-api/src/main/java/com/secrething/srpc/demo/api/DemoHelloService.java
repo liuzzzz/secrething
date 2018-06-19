@@ -5,5 +5,7 @@ package com.secrething.srpc.demo.api;
  */
 public interface DemoHelloService {
 
-    public String sayHello(String param);
+    String sayHello(String param);
+
+    String sayBye(String param);
 }

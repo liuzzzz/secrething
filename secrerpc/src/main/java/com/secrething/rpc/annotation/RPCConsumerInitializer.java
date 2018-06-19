@@ -36,7 +36,7 @@ public class RPCConsumerInitializer implements BeanPostProcessor, InitializingBe
                     fieldBeanName = field.getName();
                 }
                 try {
-                    field.set(bean, RemoteServiceFactory.getProxyInstance(clzz, fieldBeanName));
+                    field.set(bean, RemoteServiceFactory.getJDKProxyInstance(clzz, fieldBeanName));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }

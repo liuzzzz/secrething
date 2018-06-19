@@ -17,4 +17,9 @@ public class HelloService implements DemoHelloService {
     public String sayHello(String param) {
         return helloService.sayHello(param);
     }
+
+    @Override
+    public String sayBye(String param) {
+        return helloService.sayBye(param);
+    }
 }
