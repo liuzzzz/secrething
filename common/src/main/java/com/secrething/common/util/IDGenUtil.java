@@ -38,10 +38,7 @@ public final class IDGenUtil {
     private final boolean fill;
 
     private IDGenUtil() {
-        if (null != Inner.INSTANCE)
-            throw new RuntimeException("Singleton Already exist");
-        initMap();
-        this.fill = false;
+        this(false);
     }
 
     private IDGenUtil(boolean fill) {
@@ -176,23 +173,22 @@ public final class IDGenUtil {
         }
         switch (baseChar.length) {
             case 32: {//8YYYYYYYYYYYY ==>  7 31
-                if (chars.length > LONG_MAX_DISGIT_32)
-                    throw fromString(s);
-                else if (chars.length == LONG_MAX_DISGIT_32) {
-                    if (char32Map.get(chars[0]) > 7)
-                        throw fromString(s);
-                }
+                filte(s, chars, LONG_MAX_DISGIT_32, char32Map);
                 break;
             }
             case 62: { //aZl8N0y58M7  ==> 10 61 21 8 49 0 34 5 8 48 7 //64进制对应最大数 索引
-                if (chars.length > LONG_MAX_DISGIT_64)
-                    throw fromString(s);
-                else if (chars.length == LONG_MAX_DISGIT_64) {
-                    if (char64Map.get(chars[0]) > 7)
-                        throw fromString(s);
-                }
+                filte(s, chars, LONG_MAX_DISGIT_64, char64Map);
                 break;
             }
+        }
+    }
+
+    private void filte(String s, char[] chars, int longMaxDisgit32, Map<Character, Integer> char32Map) {
+        if (chars.length > longMaxDisgit32)
+            throw fromString(s);
+        else if (chars.length == longMaxDisgit32) {
+            if (char32Map.get(chars[0]) > 7)
+                throw fromString(s);
         }
     }
 
