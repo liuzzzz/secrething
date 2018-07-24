@@ -58,19 +58,11 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         final RemoteFuture future = new RemoteFuture(remoteRequest);
         logger.debug("netty client send request message begin");
         pendingCache.put(remoteRequest.getRequestId(), future);
-        Client.submit(new Runnable() {
-            @Override
-            public void run() {
+        Client.submit(() -> {
 
-                byte[] bytes = SerializeUtil.serialize(remoteRequest);
-                MessageProtocol protocol = new MessageProtocol(bytes.length, bytes);
-                channel.writeAndFlush(protocol).addListener(new ChannelFutureListener() {
-                    @Override
-                    public void operationComplete(ChannelFuture future) throws Exception {
-                        logger.debug("netty client send request message end");
-                    }
-                });
-            }
+            byte[] bytes = SerializeUtil.serialize(remoteRequest);
+            MessageProtocol protocol = new MessageProtocol(bytes.length, bytes);
+            channel.writeAndFlush(protocol).addListener((ChannelFutureListener) listener -> logger.debug("netty client send request message end"));
         });
         return future;
     }

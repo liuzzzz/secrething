@@ -2,7 +2,6 @@ package com.secrething.rpc.server;
 
 import com.secrething.common.contants.Constant;
 import com.secrething.common.util.DataContainer;
-import com.secrething.common.util.IPUtil;
 import com.secrething.common.util.MesgFormatter;
 import com.secrething.rpc.annotation.RPCProvidor;
 import com.secrething.rpc.protocol.ProtocolDecoder;

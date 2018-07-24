@@ -5,7 +5,7 @@ import com.secrething.rpc.annotation.RPCProvidor;
 import com.secrething.srpc.demo.api.DemoHelloService;
 
 /**
- * Created by liuzz on 2018/6/16.
+ * Created by liuzengzeng on 2018/6/16.
  */
 @RPCProvidor("helloService")
 public class DemoHelloServiceImpl implements DemoHelloService {

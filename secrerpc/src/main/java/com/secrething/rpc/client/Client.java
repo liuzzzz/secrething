@@ -29,7 +29,7 @@ public class Client {
             serviceDiscovery.close();
             ServiceConnectManage.getInstance().stop();
             running = false;
-            logger.info("client stoped");
+            logger.info("client stopped");
         }
     }
 
@@ -38,17 +38,13 @@ public class Client {
             return;
         final CountDownLatch latch = new CountDownLatch(1);
         serviceDiscovery = new ServiceDiscovery(latch);
-        submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    latch.await();
-                    running = true;
-                    logger.info("client init completed");
-                } catch (InterruptedException e) {
-
-                }
-
+        submit(() -> {
+            try {
+                latch.await();
+                running = true;
+                logger.info("client init completed");
+            } catch (InterruptedException e) {
+                //skip
             }
         });
     }

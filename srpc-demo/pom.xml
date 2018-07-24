@@ -16,5 +16,10 @@
         <module>srpc-demo-provider</module>
         <module>srpc-demo-consumer</module>
     </modules>
-
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
 </project>
