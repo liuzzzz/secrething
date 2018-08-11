@@ -1,13 +1,11 @@
 package com.secrething.rpc.proxy;
 
-import com.secrething.rpc.client.ClientHandler;
+import com.secrething.common.util.Assert;
 import com.secrething.rpc.core.RemoteFuture;
+import com.secrething.rpc.core.RemoteHandler;
 import com.secrething.rpc.core.RemoteRequest;
-import com.secrething.rpc.core.RemoteResponse;
-import com.secrething.rpc.registry.ServiceConnectManage;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
-import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.UUID;
@@ -17,12 +15,14 @@ import java.util.UUID;
  * 服务消费端动态代理 remote接口
  */
 public class RemoteServiceProxy implements MethodInterceptor {
-    private String beanName;
+    private final String beanName;
+    private final RemoteHandler handler;
 
-    public RemoteServiceProxy(String beanName) {
-        if (StringUtils.isBlank(beanName))
-            throw new NullPointerException("beanName is blank");
+    public RemoteServiceProxy(String beanName, RemoteHandler handler) {
+        Assert.notBlank(beanName);
+        Assert.notNull(handler);
         this.beanName = beanName;
+        this.handler = handler;
     }
 
     @Override
@@ -47,9 +47,6 @@ public class RemoteServiceProxy implements MethodInterceptor {
         remoteRequest.setMethodName(method.getName());
         remoteRequest.setParameterTypes(method.getParameterTypes());
         remoteRequest.setParameters(objects);
-        ClientHandler handler = ServiceConnectManage.getInstance().chooseHandler();
-        if (null == handler)
-            return RemoteResponse.defail(remoteRequest.getRequestId(),"net socket exception").getResult();
         RemoteFuture future = handler.sendRequest(remoteRequest);
         return future.get();
     }

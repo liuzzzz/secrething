@@ -11,9 +11,6 @@
         <module>spring-lib</module>
         <module>secrerpc</module>
         <module>protocol</module>
-        <module>srtest-parent</module>
-        <module>srpc-demo</module>
-        <module>srpc-doc</module>
     </modules>
     <packaging>pom</packaging>
     <properties>
