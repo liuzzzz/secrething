@@ -16,13 +16,15 @@ public class JDKRemoteServiceProxy implements InvocationHandler {
 
     private final String beanName;
     private final RemoteHandler handler;
-    public JDKRemoteServiceProxy(String beanName, RemoteHandler handler){
+
+    public JDKRemoteServiceProxy(String beanName, RemoteHandler handler) {
         Assert.notBlank(beanName);
         Assert.notNull(handler);
         this.beanName = beanName;
         this.handler = handler;
 
     }
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         RemoteRequest remoteRequest = new RemoteRequest();

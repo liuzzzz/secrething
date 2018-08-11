@@ -8,10 +8,15 @@ import com.secrething.common.contants.Constant;
  * 通信协议
  */
 public class MessageProtocol {
+    public static final int DEFAULT = 0;
+    public static final int PROXY = 1;
+    public static final int HEART = 2;
+    private int messageType = 0;//默认0,1代理,2心跳
+    private long messageUID;
     /**
      * 消息的开头的信息标志
      */
-    private int head_data = Constant.HEAD_DATA;
+    private int head = Constant.HEAD_DATA;
 
     /**
      * 消息的长度
@@ -34,8 +39,24 @@ public class MessageProtocol {
         this.content = content;
     }
 
-    public int getHead_data() {
-        return head_data;
+    public int getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(int messageType) {
+        this.messageType = messageType;
+    }
+
+    public long getMessageUID() {
+        return messageUID;
+    }
+
+    public void setMessageUID(long messageUID) {
+        this.messageUID = messageUID;
+    }
+
+    public int getHead() {
+        return head;
     }
 
 
@@ -58,7 +79,7 @@ public class MessageProtocol {
     @Override
     public String toString() {
         return "MessageProtocol{" +
-                "head_data='" + head_data + '\'' +
+                "head='" + head + '\'' +
                 ", contentLength=" + contentLength +
                 '}';
     }

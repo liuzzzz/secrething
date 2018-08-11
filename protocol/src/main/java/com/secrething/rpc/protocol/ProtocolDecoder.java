@@ -53,8 +53,8 @@ public class ProtocolDecoder extends ByteToMessageDecoder {
                 }
             }
 
+            long messageUID = buffer.readLong();
             // 消息的长度
-            //long messageUID = buffer.readLong();
             int length = buffer.readInt();
             // 判断请求数据包数据是否到齐
             if (buffer.readableBytes() < length) {
@@ -67,6 +67,7 @@ public class ProtocolDecoder extends ByteToMessageDecoder {
             byte[] data = new byte[length];
             buffer.readBytes(data);
             MessageProtocol protocol = new MessageProtocol(data.length, data);
+            protocol.setMessageUID(messageUID);
             out.add(protocol);
         }
     }
