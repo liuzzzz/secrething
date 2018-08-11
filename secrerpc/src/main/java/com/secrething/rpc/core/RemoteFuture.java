@@ -34,10 +34,6 @@ public class RemoteFuture extends AbstractFuture {
         return remoteResponse;
     }
 
-    public void setRemoteResponse(RemoteResponse remoteResponse) {
-        this.remoteResponse = remoteResponse;
-    }
-
     public long getBeginTime() {
         return beginTime;
     }
@@ -84,24 +80,24 @@ public class RemoteFuture extends AbstractFuture {
 
 
     private static final class Sync extends AbstractQueuedSynchronizer {
-        private volatile int done = 1;
-        private volatile int pending = 0;
+        private static final int DONE = 1;
+        private static final int PENDING = 0;
 
         @Override
         protected boolean tryAcquire(int arg) {
-            return getState() == done;
+            return getState() == DONE;
         }
 
         @Override
         protected boolean tryRelease(int arg) {
-            if (pending == getState())
-                if (compareAndSetState(pending, done))
+            if (PENDING == getState())
+                if (compareAndSetState(PENDING, DONE))
                     return true;
             return false;
         }
 
         private boolean isDone() {
-            return getState() == done;
+            return getState() == DONE;
         }
     }
 }
