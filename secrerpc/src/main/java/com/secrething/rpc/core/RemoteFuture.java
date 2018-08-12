@@ -10,7 +10,6 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 
 /**
  * Created by liuzengzeng on 2017/12/18.
- * 通信异步工具
  */
 public class RemoteFuture extends AbstractFuture {
     private static final Logger logger = LoggerFactory.getLogger(RemoteFuture.class);

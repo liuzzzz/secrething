@@ -47,7 +47,7 @@ public class RemoteServiceProxy implements MethodInterceptor {
         remoteRequest.setMethodName(method.getName());
         remoteRequest.setParameterTypes(method.getParameterTypes());
         remoteRequest.setParameters(objects);
-        RemoteFuture future = handler.sendRequest(remoteRequest);
+        RemoteFuture future = handler.send(remoteRequest);
         return future.get();
     }
 }

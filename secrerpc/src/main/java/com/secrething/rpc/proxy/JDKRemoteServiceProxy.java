@@ -33,7 +33,7 @@ public class JDKRemoteServiceProxy implements InvocationHandler {
         remoteRequest.setMethodName(method.getName());
         remoteRequest.setParameterTypes(method.getParameterTypes());
         remoteRequest.setParameters(args);
-        RemoteFuture future = handler.sendRequest(remoteRequest);
+        RemoteFuture future = handler.send(remoteRequest);
         return future.get();
     }
 }
