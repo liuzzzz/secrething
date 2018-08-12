@@ -22,14 +22,11 @@ public abstract class NettyServer {
         this.port = port;
     }
 
-
-    public abstract NettyServer getInstance();
-
     public abstract ProcessService getProcessService();
 
     public void start() {
         //暂时只用 nio方式吧
-        ServerBootstrap b = ServerBootstrapFactory.newNioServerBootstrap();
+        ServerBootstrap b = BootstrapFactory.newNioServerBootstrap();
         try {
             b.childHandler(new ServerInitializer(getProcessService())).option(ChannelOption.SO_BACKLOG, Integer.valueOf(128)).childOption(ChannelOption.SO_KEEPALIVE, Boolean.valueOf(true));
             ChannelFuture f = b.bind(this.port).sync();

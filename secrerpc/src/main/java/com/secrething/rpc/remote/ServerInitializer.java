@@ -1,8 +1,8 @@
 package com.secrething.rpc.remote;
 
+import com.secrething.rpc.core.CodecContainer;
+import com.secrething.rpc.core.ServerCodec;
 import com.secrething.rpc.protocol.ProcessService;
-import com.secrething.rpc.protocol.ProtocolDecoder;
-import com.secrething.rpc.protocol.ProtocolEncoder;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -43,9 +43,10 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
 
     @Override
     public void initChannel(SocketChannel ch) throws Exception {
+        CodecContainer codecContainer = new CodecContainer(new ServerCodec());
         ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds));
-        ch.pipeline().addLast("messageEncoder", new ProtocolEncoder());
-        ch.pipeline().addLast("messageDecoder", new ProtocolDecoder());
+        ch.pipeline().addLast("responseEncoder", codecContainer.getEncoder());
+        ch.pipeline().addLast("requestDecoder", codecContainer.getDecoder());
         ch.pipeline().addLast("readWriteAllListener", new ServerHeartHandler(maxTimeoutTimes));
         ch.pipeline().addLast("serverSocketHandler", new ServerSocketHandler(processService));
     }

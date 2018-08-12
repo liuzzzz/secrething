@@ -12,7 +12,6 @@ public class MessageProtocol {
     public static final int PROXY = 1;
     public static final int HEART = 2;
     private int messageType = 0;//默认0,1代理,2心跳
-    private long messageUID;
     /**
      * 消息的开头的信息标志
      */
@@ -31,12 +30,19 @@ public class MessageProtocol {
     /**
      * 用于初始化，org.secret.message.lib.SmartCarProtocol
      *
-     * @param contentLength 协议里面，消息数据的长度
-     * @param content       协议里面，消息的数据
+     * @param content 协议里面，消息的数据
      */
-    public MessageProtocol(int contentLength, byte[] content) {
-        this.contentLength = contentLength;
+    public MessageProtocol(byte[] content) {
         this.content = content;
+        this.contentLength = content.length;
+    }
+
+    public MessageProtocol(Object obj) {
+        this(ProtostuffSerializer.getInstance(), obj);
+    }
+
+    public MessageProtocol(Serializer serializer, Object obj) {
+        this(serializer.encode(obj));
     }
 
     public int getMessageType() {
@@ -47,18 +53,9 @@ public class MessageProtocol {
         this.messageType = messageType;
     }
 
-    public long getMessageUID() {
-        return messageUID;
-    }
-
-    public void setMessageUID(long messageUID) {
-        this.messageUID = messageUID;
-    }
-
     public int getHead() {
         return head;
     }
-
 
     public int getContentLength() {
         return contentLength;

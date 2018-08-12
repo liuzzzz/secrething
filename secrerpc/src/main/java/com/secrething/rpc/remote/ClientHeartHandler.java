@@ -17,8 +17,7 @@ public class ClientHeartHandler extends ChannelDuplexHandler {
             if (event.state() == IdleState.WRITER_IDLE) {
                 String s = "not die";
                 byte[] bytes = s.getBytes();
-                MessageProtocol protocol = new MessageProtocol(bytes.length, bytes);
-                protocol.setMessageUID(System.currentTimeMillis());
+                MessageProtocol protocol = new MessageProtocol(bytes);
                 protocol.setMessageType(MessageProtocol.HEART);
                 ctx.channel().writeAndFlush(protocol);
             }
