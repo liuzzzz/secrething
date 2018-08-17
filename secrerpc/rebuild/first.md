@@ -1,19 +1,21 @@
 #Registry
     
-    zookeeper
+    zookeeper/???
 
 
 
-#Consumer
+#Consumer--Registry(subscribe)
 
 ##Proxy
     jdk/cglib
 ##Remote
     netty
+         protocol
 
-
-#Producer
+#Producer--Registry(publish)
 ##Remote
     netty
+        protocol
+        
 ##Invoke
     jdk/cglib
