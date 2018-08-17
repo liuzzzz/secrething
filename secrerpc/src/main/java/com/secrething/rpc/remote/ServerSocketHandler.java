@@ -4,10 +4,12 @@ import com.secrething.rpc.core.RemoteRequest;
 import com.secrething.rpc.protocol.ProcessService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created by Idroton on 2018/8/11.
  */
+@Slf4j
 public class ServerSocketHandler extends SimpleChannelInboundHandler<RemoteRequest> {
     private final ProcessService processService;
 
@@ -16,8 +18,16 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<RemoteReque
     }
 
     public void channelRead0(ChannelHandlerContext ctx, RemoteRequest inputMsg) throws Exception {
-        Object obj = processService.process(inputMsg);
-        ctx.writeAndFlush(obj);
+
+        log.info("server read type = {}", inputMsg.getType());
+        if (RemoteRequest.HEART == inputMsg.getType()) {
+            ctx.fireChannelRead(inputMsg);
+        }
+        if (RemoteRequest.PROXY == inputMsg.getType()) {
+            Object obj = processService.process(inputMsg);
+            ctx.writeAndFlush(obj);
+        }
+
     }
 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

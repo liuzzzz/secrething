@@ -12,12 +12,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Created by Idroton on 2018/8/11.
  */
-public class ClientHandler extends SimpleChannelInboundHandler<RemoteResponse> {
-    private static final CopyOnWriteArrayList<Channel> CHANNELS = new CopyOnWriteArrayList<>();
-    private static final AttributeKey<Integer> CHANNEL_ID = AttributeKey.valueOf("channelId");
+public class ClientSocketHandler extends SimpleChannelInboundHandler<RemoteResponse> {
     private final ProcessService processService;
 
-    public ClientHandler(ProcessService processService) {
+    public ClientSocketHandler(ProcessService processService) {
         this.processService = processService;
     }
 

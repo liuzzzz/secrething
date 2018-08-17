@@ -35,7 +35,7 @@ public class RemoteServiceFactory {
      * @return 代理对象
      */
     public static <T> T getJDKProxyInstance(Class<T> clzz, String beanName,RemoteHandler handler) {
-        Object proxy = Proxy.newProxyInstance(clzz.getClassLoader(), new Class[]{clzz}, new JDKRemoteServiceProxy(beanName,handler));
+        Object proxy = Proxy.newProxyInstance(clzz.getClassLoader(), new Class[]{clzz}, new JDKRemoteServiceProxy(beanName,clzz.getName(),handler));
         return (T) proxy;
     }
 }

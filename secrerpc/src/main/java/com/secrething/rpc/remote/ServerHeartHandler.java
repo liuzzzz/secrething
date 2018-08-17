@@ -1,6 +1,6 @@
 package com.secrething.rpc.remote;
 
-import com.secrething.rpc.protocol.MessageProtocol;
+import com.secrething.rpc.core.RemoteRequest;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleState;
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by Idroton on 2018/8/11.
  */
-public class ServerHeartHandler extends SimpleChannelInboundHandler<MessageProtocol> {
+public class ServerHeartHandler extends SimpleChannelInboundHandler<RemoteRequest> {
     private static final Logger logger = LoggerFactory.getLogger(ServerHeartHandler.class);
     private final int maxTimes;
     private int times = 0;
@@ -21,7 +21,7 @@ public class ServerHeartHandler extends SimpleChannelInboundHandler<MessageProto
     }
 
     @Override
-    public void channelRead0(ChannelHandlerContext ctx, MessageProtocol in) throws Exception {
+    public void channelRead0(ChannelHandlerContext ctx, RemoteRequest in) throws Exception {
         times = 0;
         ctx.fireChannelRead(in);
     }

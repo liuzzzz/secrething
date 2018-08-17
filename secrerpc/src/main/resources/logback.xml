@@ -40,7 +40,7 @@
     </appender>
     <logger name="com.secrething.rpc" level="info"/>
     <root level="${loggingLevel}">
-        <appender-ref ref="DEFAULT-APPENDER"/>
+       <!-- <appender-ref ref="DEFAULT-APPENDER"/>-->
         <appender-ref ref="STDOUT-APPENDER"/>
     </root>
 

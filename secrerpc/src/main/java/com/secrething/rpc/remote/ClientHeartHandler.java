@@ -1,5 +1,6 @@
 package com.secrething.rpc.remote;
 
+import com.secrething.rpc.core.RemoteRequest;
 import com.secrething.rpc.protocol.MessageProtocol;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -15,11 +16,8 @@ public class ClientHeartHandler extends ChannelDuplexHandler {
         if (evt instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent) evt;
             if (event.state() == IdleState.WRITER_IDLE) {
-                String s = "not die";
-                byte[] bytes = s.getBytes();
-                MessageProtocol protocol = new MessageProtocol(bytes);
-                protocol.setMessageType(MessageProtocol.HEART);
-                ctx.channel().writeAndFlush(protocol);
+                RemoteRequest heart = new RemoteRequest(RemoteRequest.HEART);
+                ctx.channel().writeAndFlush(heart);
             }
         }
     }

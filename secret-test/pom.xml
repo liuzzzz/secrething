@@ -11,5 +11,11 @@
 
     <artifactId>secret-test</artifactId>
 
-
+    <dependencies>
+        <dependency>
+            <groupId>com.secrething</groupId>
+            <artifactId>secrerpc</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
 </project>

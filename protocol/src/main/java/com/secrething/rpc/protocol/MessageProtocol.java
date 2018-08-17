@@ -8,10 +8,6 @@ import com.secrething.common.contants.Constant;
  * 通信协议
  */
 public class MessageProtocol {
-    public static final int DEFAULT = 0;
-    public static final int PROXY = 1;
-    public static final int HEART = 2;
-    private int messageType = 0;//默认0,1代理,2心跳
     /**
      * 消息的开头的信息标志
      */
@@ -43,14 +39,6 @@ public class MessageProtocol {
 
     public MessageProtocol(Serializer serializer, Object obj) {
         this(serializer.encode(obj));
-    }
-
-    public int getMessageType() {
-        return messageType;
-    }
-
-    public void setMessageType(int messageType) {
-        this.messageType = messageType;
     }
 
     public int getHead() {

@@ -1,53 +1,25 @@
 package com.secrething.rpc.core;
 
+import lombok.Data;
+
 /**
  * Created by liuzengzeng on 2017/12/18.
  * 通信请求封装
  */
+@Data
 public class RemoteRequest {
+    public static final int PROXY = 0;
+    public static final int HEART = 1;
+    private final int type;
     private String requestId;
     private String beanName;
+    private String clzzName;
     private String methodName;
     private Class<?>[] parameterTypes;
     private Object[] parameters;
-
-    public String getRequestId() {
-        return requestId;
+    public RemoteRequest(int type) {
+        this.type = type;
     }
 
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
-    }
 
-    public String getBeanName() {
-        return beanName;
-    }
-
-    public void setBeanName(String beanName) {
-        this.beanName = beanName;
-    }
-
-    public String getMethodName() {
-        return methodName;
-    }
-
-    public void setMethodName(String methodName) {
-        this.methodName = methodName;
-    }
-
-    public Class<?>[] getParameterTypes() {
-        return parameterTypes;
-    }
-
-    public void setParameterTypes(Class<?>[] parameterTypes) {
-        this.parameterTypes = parameterTypes;
-    }
-
-    public Object[] getParameters() {
-        return parameters;
-    }
-
-    public void setParameters(Object[] parameters) {
-        this.parameters = parameters;
-    }
 }

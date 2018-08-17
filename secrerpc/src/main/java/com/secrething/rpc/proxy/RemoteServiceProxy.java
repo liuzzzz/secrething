@@ -1,7 +1,6 @@
 package com.secrething.rpc.proxy;
 
 import com.secrething.common.util.Assert;
-import com.secrething.rpc.core.RemoteFuture;
 import com.secrething.rpc.core.RemoteHandler;
 import com.secrething.rpc.core.RemoteRequest;
 import net.sf.cglib.proxy.MethodInterceptor;
@@ -41,13 +40,12 @@ public class RemoteServiceProxy implements MethodInterceptor {
                 throw new IllegalStateException(String.valueOf(method));
             }
         }
-        RemoteRequest remoteRequest = new RemoteRequest();
+        RemoteRequest remoteRequest = new RemoteRequest(RemoteRequest.PROXY);
         remoteRequest.setRequestId(UUID.randomUUID().toString());
         remoteRequest.setBeanName(beanName);
         remoteRequest.setMethodName(method.getName());
         remoteRequest.setParameterTypes(method.getParameterTypes());
         remoteRequest.setParameters(objects);
-        RemoteFuture future = handler.send(remoteRequest);
-        return future.get();
+        return handler.send(remoteRequest);
     }
 }

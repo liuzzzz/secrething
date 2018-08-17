@@ -11,13 +11,13 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 /**
  * Created by liuzengzeng on 2017/12/18.
  */
-public class RemoteFuture extends AbstractFuture {
+public class RemoteFuture extends AbstractFuture<RemoteResponse> {
     private static final Logger logger = LoggerFactory.getLogger(RemoteFuture.class);
     private final RemoteRequest remoteRequest;
-    private RemoteResponse remoteResponse;
     private final Sync sync;
     private final long beginTime = System.currentTimeMillis();
     private final long timeLimit = 5000;
+    private RemoteResponse remoteResponse;
 
     public RemoteFuture(RemoteRequest request) {
         this.remoteRequest = request;
@@ -26,11 +26,6 @@ public class RemoteFuture extends AbstractFuture {
 
     public RemoteRequest getRemoteRequest() {
         return remoteRequest;
-    }
-
-
-    public RemoteResponse getRemoteResponse() {
-        return remoteResponse;
     }
 
     public long getBeginTime() {
@@ -43,24 +38,16 @@ public class RemoteFuture extends AbstractFuture {
     }
 
     @Override
-    public Object get() throws InterruptedException, ExecutionException {
+    public RemoteResponse get() throws InterruptedException, ExecutionException {
         sync.acquire(-1);
-        if (this.remoteResponse != null) {
-            return this.remoteResponse.getResult();
-        } else {
-            return null;
-        }
+        return remoteResponse;
     }
 
     @Override
-    public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    public RemoteResponse get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         boolean success = sync.tryAcquireNanos(-1, unit.toNanos(timeout));
         if (success) {
-            if (this.remoteResponse != null) {
-                return this.remoteResponse.getResult();
-            } else {
-                return null;
-            }
+            return remoteResponse;
         } else {
             throw new RuntimeException("Timeout exception. Request id: " + this.remoteRequest.getRequestId()
                     + ". Request class name: " + this.remoteRequest.getBeanName()

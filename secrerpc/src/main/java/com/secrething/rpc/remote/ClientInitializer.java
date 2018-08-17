@@ -42,6 +42,6 @@ public class ClientInitializer extends ChannelInitializer<SocketChannel> {
         ch.pipeline().addLast("messageEncoder", codecContainer.getEncoder());
         ch.pipeline().addLast("messageDecoder", codecContainer.getDecoder());
         ch.pipeline().addLast("clientHeartHandler", new ClientHeartHandler());
-        ch.pipeline().addLast("clientHandler", new ClientHandler(processService));
+        ch.pipeline().addLast("clientHandler", new ClientSocketHandler(processService));
     }
 }
