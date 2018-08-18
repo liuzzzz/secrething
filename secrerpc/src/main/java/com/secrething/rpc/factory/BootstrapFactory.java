@@ -1,4 +1,4 @@
-package com.secrething.rpc.remote;
+package com.secrething.rpc.factory;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;

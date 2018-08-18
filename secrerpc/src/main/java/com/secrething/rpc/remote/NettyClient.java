@@ -1,6 +1,7 @@
 package com.secrething.rpc.remote;
 
 import com.secrething.rpc.core.*;
+import com.secrething.rpc.factory.BootstrapFactory;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
