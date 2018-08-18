@@ -1,6 +1,6 @@
 package com.secrething.test;
 
-import com.secrething.rpc.registry.ServiceStorage;
+import com.secrething.rpc.registry.ServiceLocalStorage;
 import com.secrething.rpc.remote.SecretRpcServer;
 
 /**
@@ -8,7 +8,7 @@ import com.secrething.rpc.remote.SecretRpcServer;
  */
 public class Provider {
     public static void main(String[] args) {
-        ServiceStorage.cacheService("hello",new HelloServiceImpl());
+        ServiceLocalStorage.cacheService("hello",new HelloServiceImpl());
 
         SecretRpcServer server = new SecretRpcServer();
         server.start();

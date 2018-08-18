@@ -8,13 +8,13 @@ import java.util.List;
 
 /**
  * Created by Idroton on 2018/8/12.
- * 编解码
+ * encode/decode
  */
 public interface Codec {
     int BASE_LENGTH = 4 + 4;
 
     /**
-     * 编码
+     * encode
      * @param obj
      * @param out
      * @throws Exception
@@ -25,7 +25,7 @@ public interface Codec {
     }
 
     /**
-     * 解码
+     * decode
      * @param buffer
      * @param out
      * @throws Exception

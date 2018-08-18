@@ -3,7 +3,7 @@ package com.secrething.rpc.remote;
 import com.secrething.rpc.core.RemoteRequest;
 import com.secrething.rpc.core.RemoteResponse;
 import com.secrething.rpc.protocol.ProcessService;
-import com.secrething.rpc.registry.ServiceStorage;
+import com.secrething.rpc.registry.ServiceLocalStorage;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
@@ -29,9 +29,9 @@ public class ServerProcessService implements ProcessService<RemoteRequest, Remot
     }
 
     private Object invoke(RemoteRequest request) throws Exception {
-        Object serviceImpl = ServiceStorage.borrow(request.getBeanName());
+        Object serviceImpl = ServiceLocalStorage.borrow(request.getBeanName());
         if (null == serviceImpl)
-            serviceImpl = ServiceStorage.borrow(request.getClzzName());
+            serviceImpl = ServiceLocalStorage.borrow(request.getClzzName());
         if (null == serviceImpl) {
             throw new Exception("service class not found");
         }

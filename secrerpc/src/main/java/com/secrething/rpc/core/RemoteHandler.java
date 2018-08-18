@@ -6,6 +6,7 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * Created by Idroton on 2018/8/11.
+ * send request to server
  */
 public interface RemoteHandler {
     RemoteResponse send(RemoteRequest remoteRequest) throws ExecutionException, InterruptedException;

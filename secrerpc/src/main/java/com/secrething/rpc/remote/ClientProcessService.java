@@ -8,6 +8,7 @@ import com.secrething.rpc.protocol.ProcessService;
 
 /**
  * Created by Idroton on 2018/8/12.
+ *
  */
 public class ClientProcessService implements ProcessService<RemoteResponse, Void> {
     @Override

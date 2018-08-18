@@ -11,6 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by Idroton on 2018/8/11.
+ * message by client received may be response
  */
 public class ClientSocketHandler extends SimpleChannelInboundHandler<RemoteResponse> {
     private final ProcessService processService;
@@ -20,12 +21,7 @@ public class ClientSocketHandler extends SimpleChannelInboundHandler<RemoteRespo
     }
 
     public void channelRead0(ChannelHandlerContext ctx, RemoteResponse msg) throws Exception {
-        /*if (mesg.getMessageType() == MessageProtocol.PROXY) {
-            RemoteResponse response = SerializeUtil.deserialize(mesg.getContent(), RemoteResponse.class);
-            receiveResponse(response);
-        }*/
         processService.process(msg);
-        //
     }
 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

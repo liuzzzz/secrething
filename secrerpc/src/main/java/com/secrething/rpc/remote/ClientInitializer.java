@@ -9,6 +9,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 
 /**
  * Created by Idroton on 2018/8/11.
+ *
  */
 public class ClientInitializer extends ChannelInitializer<SocketChannel> {
     private final ProcessService processService;

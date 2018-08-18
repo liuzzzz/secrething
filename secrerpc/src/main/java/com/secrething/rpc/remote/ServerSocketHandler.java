@@ -2,6 +2,7 @@ package com.secrething.rpc.remote;
 
 import com.secrething.rpc.core.RemoteRequest;
 import com.secrething.rpc.protocol.ProcessService;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
  * Created by Idroton on 2018/8/11.
  */
 @Slf4j
+@ChannelHandler.Sharable
 public class ServerSocketHandler extends SimpleChannelInboundHandler<RemoteRequest> {
     private final ProcessService processService;
 

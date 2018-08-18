@@ -7,19 +7,20 @@ import java.util.Map;
 
 /**
  * Created by Idroton on 2018/8/17 10:42 PM.
+ *
  */
-public class ServiceStorage {
+public class ServiceLocalStorage {
 
     private static final Map<String, Object> cache = Maps.newConcurrentMap();
 
     public static void cacheService(String name, Object serviceImpl) {
 
-        Class clzz = serviceImpl.getClass();
-        Class<?>[] interfaces = clzz.getInterfaces();
+        Class clz = serviceImpl.getClass();
+        Class<?>[] interfaces = clz.getInterfaces();
         cache.put(name, serviceImpl);
         if (interfaces.length > 0)
-            for (Class clz : interfaces) {
-                cache.put(clz.getName(), serviceImpl);
+            for (Class cls : interfaces) {
+                cache.put(cls.getName(), serviceImpl);
             }
 
     }
@@ -28,7 +29,4 @@ public class ServiceStorage {
         return cache.get(name);
     }
 
-    public static void main(String[] args) {
-        cacheService("hello", new ServerProcessService());
-    }
 }

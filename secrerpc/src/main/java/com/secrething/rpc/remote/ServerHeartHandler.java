@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Created by Idroton on 2018/8/11.
+ * heart beat check client's channel is active
  */
 public class ServerHeartHandler extends SimpleChannelInboundHandler<RemoteRequest> {
     private static final Logger logger = LoggerFactory.getLogger(ServerHeartHandler.class);

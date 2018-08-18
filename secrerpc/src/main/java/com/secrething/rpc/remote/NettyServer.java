@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Created by Idroton on 2018/8/11.
+ *
  */
 public abstract class NettyServer {
     private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);

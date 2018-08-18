@@ -9,6 +9,7 @@ import io.netty.handler.timeout.IdleStateEvent;
 
 /**
  * Created by Idroton on 2018/8/11.
+ * scheduled send heart message to server
  */
 public class ClientHeartHandler extends ChannelDuplexHandler {
     @Override
