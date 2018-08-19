@@ -1,11 +1,19 @@
 package com.secrething.rpc.core;
 
+import lombok.Data;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Idroton on 2018/8/12.
  */
+@Data
 public class URL {
+    private final Map<String, String> parameters = new HashMap<>();
     private String host;
     private int port;
+    private String path;
 
     public URL() {
     }
@@ -15,19 +23,4 @@ public class URL {
         this.port = port;
     }
 
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
 }
