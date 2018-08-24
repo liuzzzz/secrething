@@ -7,7 +7,7 @@ import com.secrething.common.util.MesgFormatter;
  */
 public class HelloServiceImpl implements HelloService {
     @Override
-    public String hello(String name) {
-        return MesgFormatter.format("{}: hello",name);
+    public void hello(String name) {
+         MesgFormatter.println("{}: hello",name);
     }
 }

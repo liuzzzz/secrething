@@ -14,8 +14,8 @@ public class Consumer {
 
         HelloService helloService = new JDKProxyFactory().proxyInstance(HelloService.class,"hello",client);
 
-        for (int i = 0; i < 5 ; i++) {
-            System.out.println(helloService.hello("zhangsan"+i));
+        for (int i = 0; i < 1 ; i++) {
+            helloService.hello("zhangsan"+i);
             TimeUnit.SECONDS.sleep(1);
         }
     }
