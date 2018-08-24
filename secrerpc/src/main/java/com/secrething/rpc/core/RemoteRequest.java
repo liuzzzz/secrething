@@ -20,6 +20,4 @@ public class RemoteRequest {
     public RemoteRequest(int type) {
         this.type = type;
     }
-
-
 }
