@@ -2,7 +2,7 @@ package com.secrething.rpc.core;
 
 /**
  * Created by liuzengzeng on 2017/12/18.
- * 通信返回封装
+ * remote call response
  */
 public class RemoteResponse {
     private String requestId;

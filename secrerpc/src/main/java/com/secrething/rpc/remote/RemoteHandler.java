@@ -1,4 +1,7 @@
-package com.secrething.rpc.core;
+package com.secrething.rpc.remote;
+
+import com.secrething.rpc.core.RemoteRequest;
+import com.secrething.rpc.core.RemoteResponse;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;

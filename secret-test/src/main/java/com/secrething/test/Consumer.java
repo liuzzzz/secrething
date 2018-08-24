@@ -1,7 +1,7 @@
 package com.secrething.test;
 
-import com.secrething.rpc.factory.RemoteServiceFactory;
-import com.secrething.rpc.remote.NettyClient;
+import com.secrething.rpc.proxy.JDKProxyFactory;
+import com.secrething.rpc.remote.netty.NettyClient;
 
 import java.util.concurrent.TimeUnit;
 
@@ -12,7 +12,7 @@ public class Consumer {
     public static void main(String[] args) throws InterruptedException {
         NettyClient client = new NettyClient("127.0.0.1",9999);
 
-        HelloService helloService = RemoteServiceFactory.getJDKProxyInstance(HelloService.class,"hello",client);
+        HelloService helloService = new JDKProxyFactory().proxyInstance(HelloService.class,"hello",client);
 
         for (int i = 0; i < 5 ; i++) {
             System.out.println(helloService.hello("zhangsan"+i));

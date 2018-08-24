@@ -10,12 +10,17 @@ import java.lang.annotation.Target;
 
 /**
  * Created by liuzengzeng on 2017/12/18.
- * 服务提供者端给remote接口的具体实现类添加注解
+ * used on provider's interfaces' target
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Component
-public @interface Providor {
+public @interface Provider {
+    /**
+     * maybe service name or other same of consumer's value {@link Consumer#value()}
+     * @return
+     * @see Consumer
+     */
     @Required
     String value();
 }

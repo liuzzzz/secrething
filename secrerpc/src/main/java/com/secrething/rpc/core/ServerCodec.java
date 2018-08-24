@@ -13,7 +13,6 @@ import java.util.List;
 public class ServerCodec implements Codec {
     @Override
     public void decode(ByteBuf buffer, List<Object> out) throws Exception {
-        // 可读长度必须大于基本长度
         if (buffer.readableBytes() >= BASE_LENGTH) {
             MessageProtocol protocol = MessageParser.parse(buffer,BASE_LENGTH);
             if (null != protocol){

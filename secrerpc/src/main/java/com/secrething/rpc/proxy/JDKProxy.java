@@ -1,7 +1,7 @@
 package com.secrething.rpc.proxy;
 
 import com.secrething.common.util.Assert;
-import com.secrething.rpc.core.RemoteHandler;
+import com.secrething.rpc.remote.RemoteHandler;
 import com.secrething.rpc.core.RemoteRequest;
 import com.secrething.rpc.core.RemoteResponse;
 
@@ -12,13 +12,13 @@ import java.util.UUID;
 /**
  * Created by liuzz on 2018/6/19.
  */
-public class JDKRemoteServiceProxy implements InvocationHandler {
+public class JDKProxy implements InvocationHandler {
 
     private final String beanName;
     private final String clzzName;
     private final RemoteHandler handler;
 
-    public JDKRemoteServiceProxy(String beanName, String clzzName, RemoteHandler handler) {
+    public JDKProxy(String beanName, String clzzName, RemoteHandler handler) {
         Assert.notBlank(beanName);
         Assert.notNull(handler);
         this.beanName = beanName;

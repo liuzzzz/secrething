@@ -10,11 +10,15 @@ import java.lang.annotation.Target;
 
 /**
  * Created by liuzengzeng on 2017/12/17.
- * 给消费者端给remote接口添加注解
+ * use it when need create one proxy to remote call provider's service
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Consumer {
+    /**
+     * service name or other same of Provider's value {@link Provider#value()}
+     * @return
+     */
     @Required
     String value();
 }

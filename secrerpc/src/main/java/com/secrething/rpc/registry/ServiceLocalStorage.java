@@ -1,7 +1,6 @@
 package com.secrething.rpc.registry;
 
 import com.google.common.collect.Maps;
-import com.secrething.rpc.remote.ServerProcessService;
 
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package com.secrething.rpc.remote;
+package com.secrething.rpc.remote.netty;
 
 import com.secrething.rpc.core.RemoteRequest;
 import com.secrething.rpc.core.RemoteResponse;
