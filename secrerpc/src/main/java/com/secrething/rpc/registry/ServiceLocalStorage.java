@@ -6,7 +6,6 @@ import java.util.Map;
 
 /**
  * Created by Idroton on 2018/8/17 10:42 PM.
- *
  */
 public class ServiceLocalStorage {
 
@@ -22,6 +21,10 @@ public class ServiceLocalStorage {
                 cache.put(cls.getName(), serviceImpl);
             }
 
+    }
+
+    public static Object remove(String name) {
+        return cache.remove(name);
     }
 
     public static Object borrow(String name) {
