@@ -15,7 +15,7 @@ public class IDFactory {
             throw new RuntimeException("singleton instance already exist");
     }
 
-    public static final String getMessageUID() {
+    public static final String getUID() {
         synchronized (SingletonHolder.INSTANCE){
             try {
                 return IDGenUtil.getFullInstance().toSeriaString64(SingletonHolder.INSTANCE.toString(),16);

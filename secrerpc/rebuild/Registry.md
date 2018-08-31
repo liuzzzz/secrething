@@ -3,7 +3,6 @@
                     
                     host
                     port
-                    path
                     Parameters
                         groupId
                         version
