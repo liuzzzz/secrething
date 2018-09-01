@@ -7,7 +7,9 @@ import java.util.concurrent.locks.LockSupport;
 /**
  * @author liuzengzeng
  * @create 2018/1/13
+ * This is no difference from using lock 😣
  */
+@Deprecated
 public final class ConcurrentNoLockMap<K, V> {
     private static final int GET = 0x1;
     private static final int PUT = 0x2;
@@ -64,6 +66,10 @@ public final class ConcurrentNoLockMap<K, V> {
     }
 
     public V get(Object key) {
+        return operateByKey(key, GET);
+    }
+
+    private V operateByKey(Object key, int operation) {
         if (null == key)
             throw new NullPointerException("key can not be null");
         K k = null;
@@ -72,7 +78,7 @@ public final class ConcurrentNoLockMap<K, V> {
         } catch (Exception e) {
             throw e;
         }
-        Node<K, V> node = new Node<>(k, null, this.map, GET);
+        Node<K, V> node = new Node<>(k, null, this.map, operation);
         adapter.queue.offer(node);
         while (!node.isCompleted())
             ParkUtil.park();
@@ -90,19 +96,7 @@ public final class ConcurrentNoLockMap<K, V> {
     }
 
     public V remove(Object key) {
-        if (null == key)
-            throw new NullPointerException("key can not be null");
-        K k = null;
-        try {
-            k = (K) key;
-        } catch (Exception e) {
-            throw e;
-        }
-        Node<K, V> node = new Node<>(k, null, this.map, REM);
-        adapter.queue.offer(node);
-        while (!node.isCompleted())
-            ParkUtil.park();
-        return node.v;
+        return operateByKey(key, REM);
     }
 
     @Override
