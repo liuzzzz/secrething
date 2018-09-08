@@ -1,5 +1,6 @@
 package com.secrething.learn.test;
 
+import com.secrething.common.util.Console;
 import javassist.*;
 
 import java.util.ServiceLoader;
@@ -25,7 +26,7 @@ public class ByteCodeTest {
         }
     }
     static void testServiceLoader(){
-        System.out.println(ServiceLoader.class.getClassLoader());
+        Console.println("{}",ServiceLoader.class.getClassLoader());
     }
     static void testByteCode() throws Exception{
         String clzzName = "com.secrething.learn.test.HelloWorld";

@@ -3,10 +3,7 @@ package com.secrething.common.util;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.cache.CacheBuilder;
-import com.secrething.common.util.GuavaCacheBuilder;
-import com.secrething.common.util.GuavaCacheFactory;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -90,7 +87,7 @@ public class DataContainer<K, D> {
         return new DataContainer<K, D>(CONCURRENT, null, null);
     }
 
-    public final static <K, D> DataContainer<K, D> createAutoExpireInstance(GuavaCacheBuilder cacheBuilder) {
+    public final static <K, D> DataContainer<K, D> createAutoExpireInstance(GuavaCacheBuilder<K, DataContainer<K, D>> cacheBuilder) {
         return new DataContainer<K, D>(GUAVA, null, cacheBuilder);
     }
 
@@ -150,12 +147,7 @@ public class DataContainer<K, D> {
     }
 
     public final D getData() {
-        return lockRead(new Handler<D>() {
-            @Override
-            public D readOrWrite() {
-                return data;
-            }
-        });
+        return lockRead(() -> data);
 
     }
 
@@ -182,12 +174,7 @@ public class DataContainer<K, D> {
     }
 
     public final Map<K, DataContainer<K, D>> getNodes() {
-        return lockRead(new Handler<Map<K, DataContainer<K, D>>>() {
-            @Override
-            public Map<K, DataContainer<K, D>> readOrWrite() {
-                return children;
-            }
-        });
+        return lockRead(() -> children);
     }
 
     public final DataContainer<K, D> getNode(final Object... keys) {
@@ -195,14 +182,11 @@ public class DataContainer<K, D> {
         if (keysCantGet(keys))
             return null;
         if (keys.length == 1)
-            return lockRead(new Handler<DataContainer<K, D>>() {
-                @Override
-                public DataContainer<K, D> readOrWrite() {
-                    DataContainer<K, D> chd = children.get(keys[0]);
-                    if (null == chd)
-                        return root.copy();
-                    return chd;
-                }
+            return lockRead(() -> {
+                DataContainer<K, D> chd = children.get(keys[0]);
+                if (null == chd)
+                    return root.copy();
+                return chd;
             });
         Object key = keys[keys.length - 1];
         Object[] parentKeys = Arrays.copyOf(keys, keys.length - 1);
@@ -271,21 +255,11 @@ public class DataContainer<K, D> {
         if (null == keys || keys.length < 1 || null == children)
             return null;
         else if (keys.length == 1) {
-            return lockWrite(new Handler<DataContainer<K, D>>() {
-                @Override
-                public DataContainer<K, D> readOrWrite() {
-                    return children.remove(keys[0]);
-                }
-            });
+            return lockWrite(() -> children.remove(keys[0]));
         }
         Object[] parent = selectParentKeys(keys.length - 1, keys);
         final DataContainer<K, D> node = getNode(parent);
-        return lockWrite(new Handler<DataContainer<K, D>>() {
-            @Override
-            public DataContainer<K, D> readOrWrite() {
-                return node == null ? null : node.children.remove(keys[keys.length - 1]);
-            }
-        });
+        return lockWrite(() -> node == null ? null : node.children.remove(keys[keys.length - 1]));
 
     }
 
@@ -297,7 +271,7 @@ public class DataContainer<K, D> {
         if (null != parentKeys && parentKeys.length > 0) {
             for (int i = 0; i < parentKeys.length; i++) {
                 K parentKey = parentKeys[i];
-                DataContainer curr = next.children.get(parentKey);
+                DataContainer<K, D> curr = next.children.get(parentKey);
                 if (null == curr) {
                     curr = next.createParent();
                     next.children.put(parentKey, curr);
@@ -309,18 +283,12 @@ public class DataContainer<K, D> {
     }
 
     private boolean hasChildren() {
-        return lockRead(new Handler<Boolean>() {
-            @Override
-            public Boolean readOrWrite() {
-                return null != children && !children.isEmpty();
-            }
-        });
+        return lockRead(() -> null != children && !children.isEmpty());
     }
 
     /**
      * 查找最后一个节点,返回最后一个叶子节点
      *
-     * @param index
      * @param parentKeys
      * @return Node
      */
@@ -345,13 +313,10 @@ public class DataContainer<K, D> {
 
     private void putSplitKey(final K key, final D data, final K... parentKeys) {
         final DataContainer<K, D> curr = this;
-        lockWrite(new Handler<Void>() {
-            @Override
-            public Void readOrWrite() {
-                DataContainer<K, D> node = curr.createChild(data);
-                putBase(key, node, parentKeys);
-                return null;
-            }
+        lockWrite((Handler<Void>) () -> {
+            DataContainer<K, D> node = curr.createChild(data);
+            putBase(key, node, parentKeys);
+            return null;
         });
     }
 
@@ -361,35 +326,29 @@ public class DataContainer<K, D> {
 
     private DataContainer<K, D> getNodeSplitKey(final Object key, final Object... parentKeys) {
         final DataContainer<K, D> root = this;
-        return lockRead(new Handler<DataContainer<K, D>>() {
-            @Override
-            public DataContainer<K, D> readOrWrite() {
-                if (null != parentKeys && parentKeys.length > 0) {
-                    DataContainer<K, D> node = findNode(parentKeys); //循环方式
-                    if (null == node || null == node.children)
-                        return root.copy();
-                    DataContainer<K, D> chd = node.children.get(key);
-                    if (null == chd)
-                        return root.copy();
-                    return chd;
-                }
-                DataContainer<K, D> chd = children.get(key);
+        return lockRead(() -> {
+            if (null != parentKeys && parentKeys.length > 0) {
+                DataContainer<K, D> node = findNode(parentKeys); //循环方式
+                if (null == node || null == node.children)
+                    return root.copy();
+                DataContainer<K, D> chd = node.children.get(key);
                 if (null == chd)
                     return root.copy();
                 return chd;
             }
+            DataContainer<K, D> chd = children.get(key);
+            if (null == chd)
+                return root.copy();
+            return chd;
         });
     }
 
     private D getNodeDataSplitKey(final Object key, final Object... parentKeys) {
-        return lockRead(new Handler<D>() {
-            @Override
-            public D readOrWrite() {
-                DataContainer<K, D> node = getNodeSplitKey(key, parentKeys);
-                if (null == node)
-                    return null;
-                return node.getData();
-            }
+        return lockRead(() -> {
+            DataContainer<K, D> node = getNodeSplitKey(key, parentKeys);
+            if (null == node)
+                return null;
+            return node.getData();
         });
     }
 
