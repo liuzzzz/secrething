@@ -7,11 +7,11 @@ import lombok.Data;
  * 通信请求封装
  */
 @Data
-public class RemoteRequest {
+public class RemoteRequest implements TransportData {
     public static final int PROXY = 0;
     public static final int HEART = 1;
     private final int type;
-    private String requestId;
+    private String id;
     private String beanName;
     private String clzzName;
     private String methodName;
@@ -19,5 +19,21 @@ public class RemoteRequest {
     private Object[] parameters;
     public RemoteRequest(int type) {
         this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "RemoteRequest{" +
+                "type=" + type +
+                ", id='" + id + '\'' +
+                ", beanName='" + beanName + '\'' +
+                ", clzzName='" + clzzName + '\'' +
+                ", methodName='" + methodName + '\'' +
+                '}';
+    }
+
+    @Override
+    public String transportId() {
+        return getId();
     }
 }

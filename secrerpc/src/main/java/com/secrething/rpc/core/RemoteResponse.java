@@ -4,8 +4,8 @@ package com.secrething.rpc.core;
  * Created by liuzengzeng on 2017/12/18.
  * remote call response
  */
-public class RemoteResponse {
-    private String requestId;
+public class RemoteResponse implements TransportData {
+    private String id;
     private String error;
     private Object result;
     private Throwable throwable;
@@ -14,12 +14,12 @@ public class RemoteResponse {
         return error != null;
     }
 
-    public String getRequestId() {
-        return requestId;
+    public String getId() {
+        return id;
     }
 
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getError() {
@@ -48,8 +48,13 @@ public class RemoteResponse {
 
     public static RemoteResponse defail(String requestId, String error) {
         RemoteResponse response = new RemoteResponse();
-        response.requestId = requestId;
+        response.id = requestId;
         response.error = error;
         return response;
+    }
+
+    @Override
+    public String transportId() {
+        return getId();
     }
 }

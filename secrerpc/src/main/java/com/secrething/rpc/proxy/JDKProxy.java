@@ -30,7 +30,7 @@ public class JDKProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         RemoteRequest remoteRequest = new RemoteRequest(RemoteRequest.PROXY);
-        remoteRequest.setRequestId(UUID.randomUUID().toString());
+        remoteRequest.setId(UUID.randomUUID().toString());
         remoteRequest.setBeanName(beanName);
         remoteRequest.setClzzName(clzzName);
         remoteRequest.setMethodName(method.getName());

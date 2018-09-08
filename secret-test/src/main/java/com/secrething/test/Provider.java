@@ -8,7 +8,7 @@ import com.secrething.rpc.remote.netty.SecretRpcServer;
  */
 public class Provider {
     public static void main(String[] args) {
-        ServiceLocalStorage.cacheService("hello",new HelloServiceImpl());
+        ServiceLocalStorage.cacheService(HelloService.class,new HelloServiceImpl());
 
         SecretRpcServer server = new SecretRpcServer();
         server.start();

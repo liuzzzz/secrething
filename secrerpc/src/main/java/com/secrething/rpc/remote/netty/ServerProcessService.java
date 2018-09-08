@@ -3,10 +3,9 @@ package com.secrething.rpc.remote.netty;
 import com.secrething.rpc.core.RemoteRequest;
 import com.secrething.rpc.core.RemoteResponse;
 import com.secrething.rpc.protocol.ProcessService;
+import com.secrething.rpc.registry.Invoker;
 import com.secrething.rpc.registry.ServiceLocalStorage;
 import lombok.extern.slf4j.Slf4j;
-
-import java.lang.reflect.Method;
 
 /**
  * Created by Idroton on 2018/8/17 10:37 PM.
@@ -16,7 +15,7 @@ public class ServerProcessService implements ProcessService<RemoteRequest, Remot
     @Override
     public RemoteResponse process(RemoteRequest inputMsg) {
         RemoteResponse response = new RemoteResponse();
-        response.setRequestId(inputMsg.getRequestId());
+        response.setId(inputMsg.getId());
         try {
             Object result = invoke(inputMsg);
             response.setResult(result);
@@ -29,17 +28,12 @@ public class ServerProcessService implements ProcessService<RemoteRequest, Remot
     }
 
     private Object invoke(RemoteRequest request) throws Exception {
-        Object serviceImpl = ServiceLocalStorage.borrow(request.getBeanName());
-        if (null == serviceImpl)
-            serviceImpl = ServiceLocalStorage.borrow(request.getClzzName());
-        if (null == serviceImpl) {
+        Invoker invoker = ServiceLocalStorage.borrow(request.getBeanName());
+        if (null == invoker)
+            invoker = ServiceLocalStorage.borrow(request.getClzzName());
+        if (null == invoker) {
             throw new Exception("service class not found");
         }
-        Class clzz = serviceImpl.getClass();
-        Method m = clzz.getDeclaredMethod(request.getMethodName(), request.getParameterTypes());
-        if (null == m) {
-            throw new Exception("service method not found");
-        }
-        return m.invoke(serviceImpl, request.getParameters());
+        return invoker.invoke(request.getMethodName(),request.getParameterTypes(),request.getParameters());
     }
 }

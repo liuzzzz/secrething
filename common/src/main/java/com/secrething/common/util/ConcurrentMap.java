@@ -15,11 +15,11 @@ public interface ConcurrentMap<K, V> extends java.util.concurrent.ConcurrentMap<
      * @return
      */
     default V putIfAbsent(K key, Function<?, V> func) {
-        V v = this.get(key);
+        V v = get(key);
         if (null != v)
             return v;
         V n = func.apply(null);
-        V o = this.putIfAbsent(key, n);
+        V o = putIfAbsent(key, n);
         if (null == o)
             return n;
         return o;

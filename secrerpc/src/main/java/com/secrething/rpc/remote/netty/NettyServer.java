@@ -8,6 +8,8 @@ import io.netty.channel.ChannelOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
+
 /**
  * Created by Idroton on 2018/8/11.
  *
@@ -31,7 +33,7 @@ public abstract class NettyServer {
         ServerBootstrap b = BootstrapFactory.newNioServerBootstrap();
         try {
             b.childHandler(new ServerInitializer(getProcessService())).option(ChannelOption.SO_BACKLOG, Integer.valueOf(128)).childOption(ChannelOption.SO_KEEPALIVE, Boolean.valueOf(true));
-            ChannelFuture f = b.bind(this.port).sync();
+            ChannelFuture f = b.bind(InetAddress.getLocalHost(),9999).sync();
             logger.info("server started !");
             f.channel().closeFuture().sync();
         } catch (Exception e) {
