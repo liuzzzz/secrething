@@ -1,14 +1,12 @@
 package com.secrething.rpc.core;
 
-import javassist.*;
+import com.secrething.common.util.Console;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by Idroton on 2018/9/9 2:27 PM.
  */
-public class ClassByteCodeBuilderTest {
+public class ClassBuilderTest {
 
     @Test
     public void toClass() throws Exception{
@@ -18,18 +16,18 @@ public class ClassByteCodeBuilderTest {
                 "return \"hello :\" + name;" +
                 "}";
         //pool
-        ClassByteCodeBuilder builder = new ClassByteCodeBuilder();
+        ClassBuilder builder = new ClassBuilder();
         builder.clazz(clzzName);
         builder.addMethod(helloMehodCode);
         builder.addInterface(HelloService.class);
         Class<?> clzz = builder.toClass();
         HelloService helloService = (HelloService) clzz.getConstructor().newInstance();
-        System.out.println(helloService.hello("zhangsan"));
+        Console.log(helloService.hello("zhangsan"));
        /* ClassPool classPool = new ClassPool(null);
         classPool.appendSystemPath();
         //classPool.appendClassPath("com.secrething.learn.test");
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        //System.out.println(cl.getResource(""));
+        //System.out.log(cl.getResource(""));
         classPool.appendClassPath(new LoaderClassPath(cl));
         //class
         CtClass ctclzz = classPool.makeClass(clzzName);

@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Created by Idroton on 2018/9/9 1:46 PM.
  */
-public class ClassByteCodeBuilder {
+public class ClassBuilder {
     private static final ConcurrentHashMap<ClassLoader, ClassPool> poolCache = new ConcurrentHashMap<>();
     private final ClassLoader classLoader;
     private final ClassPool classPool;
@@ -19,7 +19,7 @@ public class ClassByteCodeBuilder {
     private String className, superClassName;
     private Set<String> interfaces, fields, methods, constructors;
 
-    public ClassByteCodeBuilder() {
+    public ClassBuilder() {
         this.classLoader = Thread.currentThread().getContextClassLoader();
         this.classPool = poolCache.putIfAbsent(classLoader, (h) -> {
             ClassPool cp = new ClassPool(true);
@@ -28,12 +28,12 @@ public class ClassByteCodeBuilder {
         });
     }
 
-    public ClassByteCodeBuilder clazz(String className) {
+    public ClassBuilder clazz(String className) {
         this.className = className;
         return this;
     }
 
-    public ClassByteCodeBuilder addConstructor(String constructorCode) {
+    public ClassBuilder addConstructor(String constructorCode) {
         if (null == constructors) {
             constructors = new HashSet<>();
         }
@@ -41,17 +41,17 @@ public class ClassByteCodeBuilder {
         return this;
     }
 
-    public ClassByteCodeBuilder superClass(String superClassName) {
+    public ClassBuilder superClass(String superClassName) {
         this.superClassName = superClassName;
         return this;
     }
 
-    public ClassByteCodeBuilder superClass(Class clzz) {
+    public ClassBuilder superClass(Class clzz) {
         this.superClassName = clzz.getName();
         return this;
     }
 
-    public ClassByteCodeBuilder addInterface(String interfaceName) {
+    public ClassBuilder addInterface(String interfaceName) {
         if (null == interfaces) {
             interfaces = new HashSet<>();
         }
@@ -59,11 +59,11 @@ public class ClassByteCodeBuilder {
         return this;
     }
 
-    public ClassByteCodeBuilder addInterface(Class<?> interfase) {
+    public ClassBuilder addInterface(Class<?> interfase) {
         return addInterface(interfase.getName());
     }
 
-    public ClassByteCodeBuilder addMethod(String methodCode) {
+    public ClassBuilder addMethod(String methodCode) {
         if (null == methods) {
             methods = new HashSet<>();
         }
@@ -71,7 +71,7 @@ public class ClassByteCodeBuilder {
         return this;
     }
 
-    public ClassByteCodeBuilder addField(String fieldCode) {
+    public ClassBuilder addField(String fieldCode) {
         if (null == fields) {
             fields = new HashSet<>();
         }

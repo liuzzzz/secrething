@@ -10,7 +10,7 @@ import java.util.Date;
 public class Console {
     private static final DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
-    public static void println(String pattern, Object... args) {
+    public static void log(String pattern, Object... args) {
         Throwable t = new Throwable();
         StackTraceElement[] elements = t.getStackTrace();
         String dateLong;
@@ -22,12 +22,13 @@ public class Console {
             if (!element.getClassName().endsWith(".Console")) {
                 String s = MesgFormatter.format("{} PRINT [{}] {}:{} - {}", dateLong, Thread.currentThread().getName(), element.getClassName(), element.getLineNumber(), pattern);
                 MesgFormatter.println(s, args);
+                break;
             }
         }
 
     }
 
-    public static void println(Object args) {
-        println("{}", args);
+    public static void log(Object args) {
+        log("{}", args);
     }
 }

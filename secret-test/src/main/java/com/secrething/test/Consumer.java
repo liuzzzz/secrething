@@ -16,9 +16,9 @@ public class Consumer {
 
         for (int i = 0; i < 1 ; i++) {
             String s = helloService.hello("zhangsan"+i);
-            Console.println(s);
+            Console.log(s);
             TimeUnit.SECONDS.sleep(1);
         }*/
-       Console.println("hello");
+       Console.log("hello");
     }
 }

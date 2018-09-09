@@ -26,20 +26,20 @@ public class ByteCodeTest {
         }
     }
     static void testServiceLoader(){
-        Console.println("{}",ServiceLoader.class.getClassLoader());
+        Console.log("{}",ServiceLoader.class.getClassLoader());
     }
     static void testByteCode() throws Exception{
         String clzzName = "com.secrething.learn.test.HelloWorld";
 
         String helloMehodCode = "public void hello() {" +
-                "System.out.println(this.action);" +
+                "System.out.log(this.action);" +
                 "}";
         //pool
         ClassPool classPool = new ClassPool(null);
         classPool.appendSystemPath();
         //classPool.appendClassPath("com.secrething.learn.test");
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        //System.out.println(cl.getResource(""));
+        //System.out.log(cl.getResource(""));
         classPool.appendClassPath(new LoaderClassPath(cl));
         //class
         CtClass ctclzz = classPool.makeClass(clzzName);

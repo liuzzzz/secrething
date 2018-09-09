@@ -9,7 +9,7 @@ public class TestLink {
 
     public static void main(String[] args) {
         LinkedNode link = LinkedNode.buildLink(3, 6, 2, 9, 5, 1);
-        //System.out.println(link);
+        //System.out.log(link);
         //convertOutLink(link.getHead());
         Node node = reverse(link.getHead());
         System.out.println(node);
