@@ -21,6 +21,5 @@ public @interface Provider {
      * @return
      * @see Consumer
      */
-    @Required
     String value();
 }

@@ -76,7 +76,7 @@ public abstract class Wrapper {
             CtMethod met = CtNewMethod.make(invokeMethod.toString(), ctClass);
             ctClass.addMethod(met);
             Class<?> clz = ctClass.toClass();
-            return (Wrapper) clz.newInstance();
+            return (Wrapper) clz.getConstructor().newInstance();
         } catch (Exception e) {
             e.printStackTrace();
             //skip

@@ -19,6 +19,5 @@ public @interface Consumer {
      * service name or other same of Provider's value {@link Provider#value()}
      * @return
      */
-    @Required
     String value();
 }
