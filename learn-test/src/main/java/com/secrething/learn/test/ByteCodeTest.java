@@ -1,6 +1,6 @@
 package com.secrething.learn.test;
 
-import com.secrething.common.util.Console;
+import com.secrething.common.util.console;
 import javassist.*;
 
 import java.util.ServiceLoader;
@@ -9,11 +9,13 @@ import java.util.ServiceLoader;
  * Created by Idroton on 2018/9/2 19:49.
  */
 public class ByteCodeTest {
+
     public static void main(String[] args) throws Exception {
 
         //Location.getInfo();
-        testServiceLoader();
+        //testServiceLoader();
 
+       // test0X();
     }
     public static class Location {
         public static void getInfo(){
@@ -25,8 +27,14 @@ public class ByteCodeTest {
             System.out.println(location);
         }
     }
+    static void test0X(){
+        int o = 0Xe;
+        int p = 0Xa;
+        // 按 位与  0010 & 1101 = 0/  1010 & 1101 = 1000;
+        console.log(p );
+    }
     static void testServiceLoader(){
-        Console.log("{}",ServiceLoader.class.getClassLoader());
+        console.log("{}",ServiceLoader.class.getClassLoader());
     }
     static void testByteCode() throws Exception{
         String clzzName = "com.secrething.learn.test.HelloWorld";

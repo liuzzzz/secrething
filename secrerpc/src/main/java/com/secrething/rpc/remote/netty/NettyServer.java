@@ -1,7 +1,7 @@
 package com.secrething.rpc.remote.netty;
 
 import com.secrething.rpc.factory.BootstrapFactory;
-import com.secrething.rpc.protocol.ProcessService;
+import com.secrething.rpc.core.ProcessService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;

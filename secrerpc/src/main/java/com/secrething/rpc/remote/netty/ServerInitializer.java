@@ -2,7 +2,7 @@ package com.secrething.rpc.remote.netty;
 
 import com.secrething.rpc.core.CodecContainer;
 import com.secrething.rpc.core.ServerCodec;
-import com.secrething.rpc.protocol.ProcessService;
+import com.secrething.rpc.core.ProcessService;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;

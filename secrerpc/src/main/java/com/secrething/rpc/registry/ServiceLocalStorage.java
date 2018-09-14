@@ -31,7 +31,7 @@ public class ServiceLocalStorage {
         return cache.remove(name);
     }
 
-    public static Invoker borrow(String name) {
+    public static Invoker getInvoker(String name) {
         return cache.get(name);
     }
 

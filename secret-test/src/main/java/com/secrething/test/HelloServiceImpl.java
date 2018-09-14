@@ -1,6 +1,7 @@
 package com.secrething.test;
 
 import com.secrething.common.util.MesgFormatter;
+import com.secrething.common.util.console;
 
 /**
  * Created by Idroton on 2018/8/17 10:54 PM.
@@ -8,7 +9,7 @@ import com.secrething.common.util.MesgFormatter;
 public class HelloServiceImpl implements HelloService {
     @Override
     public String hello(String name) {
-         MesgFormatter.println("{}: hello",name);
+        console.log("{}: hello", name);
          return MesgFormatter.format("{}: hello",name);
     }
 }

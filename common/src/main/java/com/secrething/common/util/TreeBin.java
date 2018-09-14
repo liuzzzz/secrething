@@ -1,6 +1,9 @@
 package com.secrething.common.util;
 
 
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 /**
  * @author liuzengzeng
  * @create 2018/1/13
@@ -57,6 +60,20 @@ public class TreeBin {
         for (int i = 0; i < arr.length; i++) {
             bin.insert(arr[i]);
         }
-        System.out.println(bin);
+        Node node = bin.root;
+        LinkedBlockingQueue<Node> queue = new LinkedBlockingQueue<>();
+        queue.offer(node);
+        for (; ; ) {
+            Node n = queue.poll();
+            if (null == n) {
+                break;
+            }
+            System.out.println(n.data);
+            if (null != n.left)
+                queue.offer(n.left);
+            if (null != n.right)
+                queue.offer(n.right);
+        }
+
     }
 }

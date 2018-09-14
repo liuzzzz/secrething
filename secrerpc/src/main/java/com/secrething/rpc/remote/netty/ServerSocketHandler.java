@@ -1,7 +1,7 @@
 package com.secrething.rpc.remote.netty;
 
 import com.secrething.rpc.core.RemoteRequest;
-import com.secrething.rpc.protocol.ProcessService;
+import com.secrething.rpc.core.ProcessService;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -26,8 +26,7 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<RemoteReque
             ctx.fireChannelRead(inputMsg);
         }
         if (RemoteRequest.PROXY == inputMsg.getType()) {
-            Object obj = processService.process(inputMsg);
-            ctx.writeAndFlush(obj);
+            processService.process(ctx.channel(), inputMsg);
         }
 
     }
