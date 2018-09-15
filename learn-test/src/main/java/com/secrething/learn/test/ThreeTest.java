@@ -1,11 +1,15 @@
 package com.secrething.learn.test;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+
 /**
  * Created by liuzz on 2018/8/30 00:07 AM.
  */
 public class ThreeTest {
 
-
+/**/
 
     public static int inputThree(String num){
         int idx = 0;
@@ -36,8 +40,46 @@ public class ThreeTest {
         }
         return count;
     }
+    //统计java文件有多少行注释
+    public static int calculateAnno(File file){
+        int count = 0;
+        if (null == file || !file.getName().endsWith(".java")){
+            return count;
+        }
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line = null;
 
-    public static void main(String[] args) {
-        System.out.println(inputThree("002021000123"));
+            boolean isMulti = false;
+            while ((line = reader.readLine()) != null){
+                if (line.indexOf("//") > -1){
+                    count++;
+                    continue;
+                }
+                if (line.indexOf("/*") > -1){
+                    if (line.indexOf("*/") > -1){
+                        count++;
+                        continue;
+                    }
+                    isMulti = true;
+                }
+                if (isMulti){
+                    count++;
+                }
+                if (line.indexOf("*/") > -1){
+                    isMulti = false;
+                }
+            }
+            reader.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return count;
+
+    }
+    public static void main(String[] args){
+        File file = new File("/Users/Idroton/workspace/secrething/learn-test/src/main/java/com/secrething/learn/test/ByteCodeTest.java");
+        System.out.println(calculateAnno(file));
+
     }
 }
