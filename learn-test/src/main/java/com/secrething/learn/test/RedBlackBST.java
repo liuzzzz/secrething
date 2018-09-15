@@ -6,9 +6,10 @@ import java.util.Comparator;
  * Created by liuzz on 2018/9/14 8:46 PM.
  */
 public class RedBlackBST<T> {
+    private static final boolean BLACK = false;
+    private static final boolean RED = true;
     private final Comparator<T> comparator;
     private Node<T> root;
-
     private int size;
 
     public RedBlackBST(Comparator<T> comparator) {
@@ -24,15 +25,22 @@ public class RedBlackBST<T> {
     public static void main(String[] args) {
         RedBlackBST<Integer> brt = new RedBlackBST<>(((o1, o2) -> o2 - o1));
 
-        for (int i = 0; i < 32 ; i++) {
+        for (int i = 0; i < 32; i++) {
             brt.insert(i);
         }
         System.out.println(brt);
     }
 
     public void insert(T t) {
+        if (null == t)
+            return;
         insert(root, t);
-        root.red = false;
+        root.color = BLACK;
+        size++;
+    }
+
+    public int size() {
+        return size;
     }
 
     //插入节点
@@ -66,34 +74,34 @@ public class RedBlackBST<T> {
     private void checkTree(Node<T> node) {
         Node<T> parent = node.parent;
         //父亲是红色,无需判断空指针，如果父节点为null,那么会作为根节点不会走到这一步
-        if (null != parent && parent.red) {
+        if (null != parent && (parent.color == RED)) {
             Node<T> uncle = node.uncle();
             //叔叔是红色
-            if (null != uncle && uncle.red) {
-                parent.red = uncle.red = false;
-                node.grandParent().red = true;
+            if (null != uncle && (uncle.color == RED)) {
+                parent.color = uncle.color = BLACK;
+                node.grandParent().color = RED;
                 checkTree(node.grandParent());
             } else {//叔叔是黑色
                 if (node == parent.left && parent == node.grandParent().left) {
-                    parent.red = false;
-                    node.grandParent().red = true;
+                    parent.color = BLACK;
+                    node.grandParent().color = RED;
                     rotateRight(node.parent);
                 } else if (node == parent.right && parent == node.grandParent().right) {
-                    parent.red = false;
-                    node.grandParent().red = true;
+                    parent.color = BLACK;
+                    node.grandParent().color = RED;
                     rotateLeft(node.parent);
                 } else if (node == parent.left && parent == node.grandParent().right) {
                     rotateLeft(node);
                     rotateRight(node);
-                    node.red = false;
-                    node.left.red = true;
-                    node.right.red = true;
+                    node.color = BLACK;
+                    node.left.color = RED;
+                    node.right.color = RED;
                 } else if (node == parent.right && parent == node.grandParent().left) {
                     rotateRight(node);
                     rotateLeft(node);
-                    node.red = false;
-                    node.left.red = true;
-                    node.right.red = true;
+                    node.color = BLACK;
+                    node.left.color = RED;
+                    node.right.color = RED;
                 }
             }
 
@@ -175,7 +183,7 @@ public class RedBlackBST<T> {
         Node<T> parent;
         Node<T> left;
         Node<T> right;
-        boolean red = true;
+        boolean color = RED;
 
         //祖父
         Node<T> grandParent() {
