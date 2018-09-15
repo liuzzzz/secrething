@@ -21,14 +21,19 @@ public class RedBlackBST<T> {
         node.data = t;
         return node;
     }
+    static int serchCount = 0;
 
     public static void main(String[] args) {
         RedBlackBST<Integer> brt = new RedBlackBST<>(((o1, o2) -> o2 - o1));
 
-        for (int i = 0; i < 32; i++) {
+        for (int i = 0; i < 100; i++) {
             brt.insert(i);
         }
-        System.out.println(brt);
+        brt.traversing(brt.root);
+        /*long begin = System.currentTimeMillis();
+        brt.search(brt.root,9999999);
+        System.out.println(System.currentTimeMillis() - begin);
+        System.out.println(serchCount);*/
     }
 
     public void insert(T t) {
@@ -42,7 +47,36 @@ public class RedBlackBST<T> {
     public int size() {
         return size;
     }
+    public void traversing(Node<T> node){
+        if (null == node){
+            return;
+        }
+        traversing(node.left);
+        System.out.println(node.data);
+        traversing(node.right);
+    }
+    public void search(Node<T> p,T t){
+        if (null != p){
+            serchCount++;
+            if (comparator.compare(p.data,t) == 0){
+                System.out.println("searched");
+            }else if (comparator.compare(p.data,t) > 0){
+                if (null != p.right){
+                    search(p.right,t);
+                }else {
+                    System.out.println("not found");
+                }
 
+            }else if (comparator.compare(p.data,t) < 0){
+                if (null != p.left){
+                    search(p.left,t);
+                }else {
+                    System.out.println("not found");
+                }
+
+            }
+        }
+    }
     //插入节点
     private void insert(Node<T> parent, T t) {
         if (null == parent) {
