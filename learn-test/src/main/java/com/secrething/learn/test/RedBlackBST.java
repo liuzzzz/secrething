@@ -26,9 +26,10 @@ public class RedBlackBST<T> {
     public static void main(String[] args) {
         RedBlackBST<Integer> brt = new RedBlackBST<>(((o1, o2) -> o2 - o1));
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             brt.insert(i);
         }
+
         brt.traversing(brt.root);
         /*long begin = System.currentTimeMillis();
         brt.search(brt.root,9999999);
@@ -60,18 +61,21 @@ public class RedBlackBST<T> {
             serchCount++;
             if (comparator.compare(p.data,t) == 0){
                 System.out.println("searched");
+                if (null != p.right){
+                    search(p.right,t);
+                }
             }else if (comparator.compare(p.data,t) > 0){
                 if (null != p.right){
                     search(p.right,t);
                 }else {
-                    System.out.println("not found");
+                    System.out.println("completed");
                 }
 
             }else if (comparator.compare(p.data,t) < 0){
                 if (null != p.left){
                     search(p.left,t);
                 }else {
-                    System.out.println("not found");
+                    System.out.println("completed");
                 }
 
             }
