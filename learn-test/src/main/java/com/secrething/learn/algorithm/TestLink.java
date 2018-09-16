@@ -1,4 +1,4 @@
-package com.secrething.learn.test;
+package com.secrething.learn.algorithm;
 
 /**
  * Created by liuzz on 2018/8/29 10:05 PM.

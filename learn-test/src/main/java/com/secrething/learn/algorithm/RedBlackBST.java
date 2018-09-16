@@ -1,4 +1,4 @@
-package com.secrething.learn.test;
+package com.secrething.learn.algorithm;
 
 import java.util.Comparator;
 

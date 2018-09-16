@@ -16,7 +16,7 @@ public class URL {
     private String host;
     private int port;
     /**
-     * interface --> com.secrething.test.HelloService
+     * interface --> com.secrething.algorithm.HelloService
      * method    --> hello
      */
     private Map<String, String> parameters;

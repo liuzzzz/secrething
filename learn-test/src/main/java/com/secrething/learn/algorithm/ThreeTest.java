@@ -1,4 +1,4 @@
-package com.secrething.learn.test;
+package com.secrething.learn.algorithm;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -78,7 +78,7 @@ public class ThreeTest {
 
     }
     public static void main(String[] args){
-        File file = new File("/Users/Idroton/workspace/secrething/learn-test/src/main/java/com/secrething/learn/test/ByteCodeTest.java");
+        File file = new File("/Users/Idroton/workspace/secrething/learn-algorithm/src/main/java/com/secrething/learn/algorithm/ByteCodeTest.java");
         System.out.println(calculateAnno(file));
 
     }
