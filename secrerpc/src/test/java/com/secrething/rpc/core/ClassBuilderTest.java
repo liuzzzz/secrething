@@ -25,7 +25,7 @@ public class ClassBuilderTest {
         console.log(helloService.hello("zhangsan"));
        /* ClassPool classPool = new ClassPool(null);
         classPool.appendSystemPath();
-        //classPool.appendClassPath("com.secrething.learn.test");
+        //classPool.appendClassPath("com.secrething.learn.algorithm");
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         //System.out.log(cl.getResource(""));
         classPool.appendClassPath(new LoaderClassPath(cl));
