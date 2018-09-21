@@ -8,6 +8,7 @@ import java.util.Comparator;
 public class RedBlackBST<T> {
     private static final boolean BLACK = false;
     private static final boolean RED = true;
+    static int serchCount = 0;
     private final Comparator<T> comparator;
     private Node<T> root;
     private int size;
@@ -21,7 +22,6 @@ public class RedBlackBST<T> {
         node.data = t;
         return node;
     }
-    static int serchCount = 0;
 
     public static void main(String[] args) {
         RedBlackBST<Integer> brt = new RedBlackBST<>(((o1, o2) -> o2 - o1));
@@ -48,39 +48,44 @@ public class RedBlackBST<T> {
     public int size() {
         return size;
     }
-    public void traversing(Node<T> node){
-        if (null == node){
+
+    public void traversing(Node<T> node) {
+        if (null == node) {
             return;
         }
         traversing(node.left);
         System.out.println(node.data);
         traversing(node.right);
     }
-    public void search(Node<T> p,T t){
-        if (null != p){
-            serchCount++;
-            if (comparator.compare(p.data,t) == 0){
-                System.out.println("searched");
-                if (null != p.right){
-                    search(p.right,t);
-                }
-            }else if (comparator.compare(p.data,t) > 0){
-                if (null != p.right){
-                    search(p.right,t);
-                }else {
-                    System.out.println("completed");
-                }
 
-            }else if (comparator.compare(p.data,t) < 0){
-                if (null != p.left){
-                    search(p.left,t);
-                }else {
-                    System.out.println("completed");
+    private Node<T> search(Node<T> p, T t) {
+        if (null != p) {
+            serchCount++;
+            if (comparator.compare(p.data, t) == 0) {
+                System.out.println("searched");
+                return p;
+                //要继续往下找么?
+                /*if (null != p.right) {
+                    search(p.right, t);
+                }*/
+            } else if (comparator.compare(p.data, t) > 0) {
+                if (null != p.right) {
+                    return search(p.right, t);
+                } else {
+                    return null;
+                }
+            } else if (comparator.compare(p.data, t) < 0) {
+                if (null != p.left) {
+                    return search(p.left, t);
+                } else {
+                    return null;
                 }
 
             }
         }
+        return null;
     }
+
     //插入节点
     private void insert(Node<T> parent, T t) {
         if (null == parent) {
@@ -214,6 +219,22 @@ public class RedBlackBST<T> {
             else
                 gp.right = p;
         }
+    }
+
+    public Node<T> delete(T data) {
+        Node<T> node = search(root, data);
+        if (null != node) {
+            deleteNode(node);
+        }
+        return node;
+    }
+
+    private void deleteNode(Node<T> node) {
+        Node<T> child = node.left == null ? node.right : root.left;
+        if (root == node && root.left == null && root.right == null) {
+            root = null;
+        }else if (root == node ){}
+
     }
 
     private static class Node<T> {
