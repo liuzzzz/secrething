@@ -37,6 +37,33 @@ public class RedBlackBST<T> {
         System.out.println(serchCount);*/
     }
 
+    private static boolean colorOf(Node node) {
+        return null == node ? BLACK : node.color;
+    }
+
+    private static <T> Node<T> leftOf(Node<T> node) {
+        return null != node ? node.left : null;
+    }
+
+    private static <T> Node<T> rightOf(Node<T> node) {
+        return null != node ? node.right : null;
+    }
+
+    private static <T> Node<T> parentOf(Node<T> node) {
+        return null != node ? node.parent : null;
+    }
+
+    private static <T> Node<T> grandParentOf(Node<T> node) {
+        Node<T> p = parentOf(node);
+        return null != p ? parentOf(p) : null;
+    }
+
+    private static void setColor(Node node, boolean c) {
+        if (null != node) {
+            node.color = c;
+        }
+    }
+
     public void insert(T t) {
         if (null == t)
             return;
@@ -115,36 +142,36 @@ public class RedBlackBST<T> {
 
     //重新调整树
     private void checkTree(Node<T> node) {
-        Node<T> parent = node.parent;
+        Node<T> parent = parentOf(node);
         //父亲是红色,无需判断空指针，如果父节点为null,那么会作为根节点不会走到这一步
-        if (null != parent && (parent.color == RED)) {
+        if (null != parent && (colorOf(parent) == RED)) {
             Node<T> uncle = node.uncle();
             //叔叔是红色
-            if (null != uncle && (uncle.color == RED)) {
+            if (null != uncle && (colorOf(uncle) == RED)) {
                 parent.color = uncle.color = BLACK;
                 node.grandParent().color = RED;
                 checkTree(node.grandParent());
             } else {//叔叔是黑色
-                if (node == parent.left && parent == node.grandParent().left) {
-                    parent.color = BLACK;
-                    node.grandParent().color = RED;
-                    rotateRight(node.parent);
-                } else if (node == parent.right && parent == node.grandParent().right) {
-                    parent.color = BLACK;
-                    node.grandParent().color = RED;
-                    rotateLeft(node.parent);
-                } else if (node == parent.left && parent == node.grandParent().right) {
+                if (node == leftOf(parent) && parent == leftOf(node.grandParent())) {
+                    setColor(parent, BLACK);
+                    setColor(node.grandParent(), RED);
+                    rotateRight(parentOf(node));
+                } else if (node == rightOf(parent) && parent == rightOf(node.grandParent())) {
+                    setColor(parent, BLACK);
+                    setColor(grandParentOf(node),RED);
+                    rotateLeft(parent);
+                } else if (node == leftOf(parent) && parent == rightOf(node.grandParent())) {
                     rotateLeft(node);
                     rotateRight(node);
-                    node.color = BLACK;
-                    node.left.color = RED;
-                    node.right.color = RED;
-                } else if (node == parent.right && parent == node.grandParent().left) {
+                    setColor(node,BLACK);
+                    setColor(leftOf(node),RED);
+                    setColor(rightOf(node),RED);
+                } else if (node == rightOf(parent) && parent == leftOf(node.grandParent())) {
                     rotateRight(node);
                     rotateLeft(node);
-                    node.color = BLACK;
-                    node.left.color = RED;
-                    node.right.color = RED;
+                    setColor(node,BLACK);
+                    setColor(leftOf(node),RED);
+                    setColor(rightOf(node),RED);
                 }
             }
 
@@ -233,7 +260,8 @@ public class RedBlackBST<T> {
         Node<T> child = node.left == null ? node.right : root.left;
         if (root == node && root.left == null && root.right == null) {
             root = null;
-        }else if (root == node ){}
+        } else if (root == node) {
+        }
 
     }
 
