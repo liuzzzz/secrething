@@ -13,6 +13,9 @@ public class RedBlackBST<T> {
     private Node<T> root;
     private int size;
 
+    private Node<T> head;
+    private Node<T> tail;
+
     public RedBlackBST(Comparator<T> comparator) {
         this.comparator = comparator;
     }
@@ -20,16 +23,17 @@ public class RedBlackBST<T> {
     private static <T> Node<T> buildNode(T t) {
         Node<T> node = new Node<>();
         node.data = t;
+
         return node;
     }
 
     public static void main(String[] args) {
         RedBlackBST<Integer> brt = new RedBlackBST<>(((o1, o2) -> o2 - o1));
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             brt.insert(i);
         }
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             brt.delete(i);
             brt.traversing(brt.root);
         }
@@ -84,8 +88,11 @@ public class RedBlackBST<T> {
             return;
         }
         traversing(node.left);
-        System.out.println(node.data);
+        System.out.print(node.data +"\t");
         traversing(node.right);
+        if (node == tail){
+            System.out.println();
+        }
     }
 
     private Node<T> search(Node<T> p, T t) {
@@ -120,12 +127,20 @@ public class RedBlackBST<T> {
     private void insert(Node<T> parent, T t) {
         if (null == parent) {
             root = buildNode(t);
+            head = tail = root;
+            head.next = tail;
+            tail.prev = head;
         } else {
             if (comparator.compare(parent.data, t) >= 0) {
                 if (null != parent.right) {
                     insert(parent.right, t);
                 } else {
-                    parent.right = buildNode(t);
+                    Node<T> newNode = buildNode(t);
+                    parent.right =newNode;
+                    Node<T> prevTail = tail;
+                    tail = newNode;
+                    prevTail.next = tail;
+                    tail.prev = prevTail;
                     parent.right.parent = parent;
                     fixUpAfterInsertion(parent.right);
                 }
@@ -133,7 +148,12 @@ public class RedBlackBST<T> {
                 if (null != parent.left) {
                     insert(parent.left, t);
                 } else {
-                    parent.left = buildNode(t);
+                    Node<T> newNode = buildNode(t);
+                    parent.left =newNode;
+                    Node<T> prevTail = tail;
+                    tail = newNode;
+                    prevTail.next = tail;
+                    tail.prev = prevTail;
                     parent.left.parent = parent;
                     fixUpAfterInsertion(parent.left);
                 }
@@ -185,7 +205,7 @@ public class RedBlackBST<T> {
         //如果父亲是黑的,对树没影响，不调整
     }
 
-    //右旋
+    //右旋 右上方
     private void rotateRight(Node<T> p) {
         if (p.parent == null) {
             root = p;
@@ -224,7 +244,7 @@ public class RedBlackBST<T> {
 
 
     }
-
+    //左上方左旋
     private void rotateLeft(Node<T> p) {
         if (p.parent == null) {
             root = p;
@@ -258,6 +278,20 @@ public class RedBlackBST<T> {
         Node<T> node = search(root, data);
         if (null != node) {
             deleteNode(node);
+            if (node == tail){
+                if (null != node.prev){
+                    node.prev.next = null;
+                }
+                tail = node.prev;
+            }else if (node == head){
+                head = node.next;
+                head.prev = null;
+            }else {
+                Node<T> prev = node.prev;
+                Node<T> next = node.next;
+                prev.next = next;
+                next.prev = prev;
+            }
         }
         return node;
     }
@@ -308,8 +342,66 @@ public class RedBlackBST<T> {
 
     }
 
-    private void fixUpAfterDeletion(Node<T> t) {
+    private void fixUpAfterDeletion(Node<T> x) {
+        while (x != root && colorOf(x) == BLACK) {
+            if (x == leftOf(parentOf(x))) {
+                Node<T> sib = rightOf(parentOf(x));
 
+                if (colorOf(sib) == RED) {
+                    setColor(sib, BLACK);
+                    setColor(parentOf(x), RED);
+                    rotateLeft(rightOf(parentOf(x)));
+                    sib = rightOf(parentOf(x));
+                }
+
+                if (colorOf(leftOf(sib))  == BLACK &&
+                        colorOf(rightOf(sib)) == BLACK) {
+                    setColor(sib, RED);
+                    x = parentOf(x);
+                } else {
+                    if (colorOf(rightOf(sib)) == BLACK) {
+                        setColor(leftOf(sib), BLACK);
+                        setColor(sib, RED);
+                        rotateRight(leftOf(sib));
+                        sib = rightOf(parentOf(x));
+                    }
+                    setColor(sib, colorOf(parentOf(x)));
+                    setColor(parentOf(x), BLACK);
+                    setColor(rightOf(sib), BLACK);
+                    rotateLeft(rightOf(parentOf(x)));
+                    x = root;
+                }
+            } else { // symmetric
+                Node<T> sib = leftOf(parentOf(x));
+
+                if (colorOf(sib) == RED) {
+                    setColor(sib, BLACK);
+                    setColor(parentOf(x), RED);
+                    rotateRight(leftOf(parentOf(x)));
+                    sib = leftOf(parentOf(x));
+                }
+
+                if (colorOf(rightOf(sib)) == BLACK &&
+                        colorOf(leftOf(sib)) == BLACK) {
+                    setColor(sib, RED);
+                    x = parentOf(x);
+                } else {
+                    if (colorOf(leftOf(sib)) == BLACK) {
+                        setColor(rightOf(sib), BLACK);
+                        setColor(sib, RED);
+                        rotateLeft(rightOf(sib));
+                        sib = leftOf(parentOf(x));
+                    }
+                    setColor(sib, colorOf(parentOf(x)));
+                    setColor(parentOf(x), BLACK);
+                    setColor(leftOf(sib), BLACK);
+                    rotateRight(leftOf(parentOf(x)));
+                    x = root;
+                }
+            }
+        }
+
+        setColor(x, BLACK);
     }
 
     private static class Node<T> {
@@ -318,7 +410,8 @@ public class RedBlackBST<T> {
         Node<T> left;
         Node<T> right;
         boolean color = RED;
-
+        Node<T> next;
+        Node<T> prev;
         //祖父
         Node<T> grandParent() {
             if (null == parent)
