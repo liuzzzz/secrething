@@ -1,6 +1,11 @@
 package com.secrething.learn.algorithm;
 
+import com.secrething.common.contants.ConsoleColor;
+import com.secrething.common.util.Console;
+
 import java.util.Comparator;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by liuzz on 2018/9/14 8:46 PM.
@@ -30,13 +35,13 @@ public class RedBlackBST<T> {
     public static void main(String[] args) {
         RedBlackBST<Integer> brt = new RedBlackBST<>(((o1, o2) -> o2 - o1));
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 32; i++) {
             brt.insert(i);
         }
-        for (int i = 0; i < 100; i++) {
-            brt.delete(i);
-            brt.traversing(brt.root);
-        }
+        brt.traversing();
+        brt.delete(8);
+        System.out.println("-------------------");
+        brt.traversing();
 
         /*long begin = System.currentTimeMillis();
         brt.search(brt.root,9999999);
@@ -83,15 +88,27 @@ public class RedBlackBST<T> {
         return size;
     }
 
-    public void traversing(Node<T> node) {
-        if (null == node) {
-            return;
-        }
-        traversing(node.left);
-        System.out.print(node.data +"\t");
-        traversing(node.right);
-        if (node == tail){
-            System.out.println();
+    public void traversing() {
+
+        Queue<Node<T>> queue = new LinkedBlockingQueue<>();
+        queue.add(root);
+        Node<T> prev = null;
+        while (!queue.isEmpty()) {
+            Node<T> node = queue.poll();
+            if (null != prev && comparator.compare(prev.data, node.data) < 0) {
+                System.out.println();
+            }
+            if (node.color == RED) {
+                Console.print(node.data, ConsoleColor.RED);
+            } else {
+                Console.print(node.data);
+            }
+            Console.print("\t");
+            if (null != leftOf(node))
+                queue.add(node.left);
+            if (null != rightOf(node))
+                queue.add(node.right);
+            prev = node;
         }
     }
 
@@ -136,7 +153,7 @@ public class RedBlackBST<T> {
                     insert(parent.right, t);
                 } else {
                     Node<T> newNode = buildNode(t);
-                    parent.right =newNode;
+                    parent.right = newNode;
                     Node<T> prevTail = tail;
                     tail = newNode;
                     prevTail.next = tail;
@@ -149,7 +166,7 @@ public class RedBlackBST<T> {
                     insert(parent.left, t);
                 } else {
                     Node<T> newNode = buildNode(t);
-                    parent.left =newNode;
+                    parent.left = newNode;
                     Node<T> prevTail = tail;
                     tail = newNode;
                     prevTail.next = tail;
@@ -244,6 +261,7 @@ public class RedBlackBST<T> {
 
 
     }
+
     //左上方左旋
     private void rotateLeft(Node<T> p) {
         if (p.parent == null) {
@@ -278,15 +296,15 @@ public class RedBlackBST<T> {
         Node<T> node = search(root, data);
         if (null != node) {
             deleteNode(node);
-            if (node == tail){
-                if (null != node.prev){
+            if (node == tail) {
+                if (null != node.prev) {
                     node.prev.next = null;
                 }
                 tail = node.prev;
-            }else if (node == head){
+            } else if (node == head) {
                 head = node.next;
                 head.prev = null;
-            }else {
+            } else {
                 Node<T> prev = node.prev;
                 Node<T> next = node.next;
                 prev.next = next;
@@ -342,7 +360,10 @@ public class RedBlackBST<T> {
 
     }
 
+    //删除时 只讨论 被删除节点无子节点或只有一个子节点的情况, 如若被删除节点有两个子节点,会迭代向下寻找接替者,以接替者为调整节点
+    //
     private void fixUpAfterDeletion(Node<T> x) {
+
         while (x != root && colorOf(x) == BLACK) {
             if (x == leftOf(parentOf(x))) {
                 Node<T> sib = rightOf(parentOf(x));
@@ -354,7 +375,7 @@ public class RedBlackBST<T> {
                     sib = rightOf(parentOf(x));
                 }
 
-                if (colorOf(leftOf(sib))  == BLACK &&
+                if (colorOf(leftOf(sib)) == BLACK &&
                         colorOf(rightOf(sib)) == BLACK) {
                     setColor(sib, RED);
                     x = parentOf(x);
@@ -412,6 +433,7 @@ public class RedBlackBST<T> {
         boolean color = RED;
         Node<T> next;
         Node<T> prev;
+
         //祖父
         Node<T> grandParent() {
             if (null == parent)
@@ -444,7 +466,5 @@ public class RedBlackBST<T> {
                 return parent.left;
             }
         }
-
-
     }
 }
