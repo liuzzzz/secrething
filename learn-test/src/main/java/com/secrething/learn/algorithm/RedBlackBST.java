@@ -29,8 +29,11 @@ public class RedBlackBST<T> {
         for (int i = 0; i < 10; i++) {
             brt.insert(i);
         }
+        for (int i = 0; i < 10; i++) {
+            brt.delete(i);
+            brt.traversing(brt.root);
+        }
 
-        brt.traversing(brt.root);
         /*long begin = System.currentTimeMillis();
         brt.search(brt.root,9999999);
         System.out.println(System.currentTimeMillis() - begin);
@@ -124,7 +127,7 @@ public class RedBlackBST<T> {
                 } else {
                     parent.right = buildNode(t);
                     parent.right.parent = parent;
-                    checkTree(parent.right);
+                    fixUpAfterInsertion(parent.right);
                 }
             } else {
                 if (null != parent.left) {
@@ -132,7 +135,7 @@ public class RedBlackBST<T> {
                 } else {
                     parent.left = buildNode(t);
                     parent.left.parent = parent;
-                    checkTree(parent.left);
+                    fixUpAfterInsertion(parent.left);
                 }
 
             }
@@ -141,38 +144,41 @@ public class RedBlackBST<T> {
     }
 
     //重新调整树
-    private void checkTree(Node<T> node) {
-        Node<T> parent = parentOf(node);
+    private void fixUpAfterInsertion(Node<T> nd) {
+        Node<T> node = nd;
         //父亲是红色,无需判断空指针，如果父节点为null,那么会作为根节点不会走到这一步
-        if (null != parent && (colorOf(parent) == RED)) {
+        Node<T> parent = parentOf(node);
+        while (null != parent && (colorOf(parent) == RED)) {
             Node<T> uncle = node.uncle();
             //叔叔是红色
             if (null != uncle && (colorOf(uncle) == RED)) {
                 parent.color = uncle.color = BLACK;
                 node.grandParent().color = RED;
-                checkTree(node.grandParent());
-            } else {//叔叔是黑色
+                node = grandParentOf(node);
+                parent = parentOf(node);
+            } else { //叔叔是黑色
                 if (node == leftOf(parent) && parent == leftOf(node.grandParent())) {
                     setColor(parent, BLACK);
                     setColor(node.grandParent(), RED);
                     rotateRight(parentOf(node));
                 } else if (node == rightOf(parent) && parent == rightOf(node.grandParent())) {
                     setColor(parent, BLACK);
-                    setColor(grandParentOf(node),RED);
+                    setColor(grandParentOf(node), RED);
                     rotateLeft(parent);
                 } else if (node == leftOf(parent) && parent == rightOf(node.grandParent())) {
                     rotateLeft(node);
                     rotateRight(node);
-                    setColor(node,BLACK);
-                    setColor(leftOf(node),RED);
-                    setColor(rightOf(node),RED);
+                    setColor(node, BLACK);
+                    setColor(leftOf(node), RED);
+                    setColor(rightOf(node), RED);
                 } else if (node == rightOf(parent) && parent == leftOf(node.grandParent())) {
                     rotateRight(node);
                     rotateLeft(node);
-                    setColor(node,BLACK);
-                    setColor(leftOf(node),RED);
-                    setColor(rightOf(node),RED);
+                    setColor(node, BLACK);
+                    setColor(leftOf(node), RED);
+                    setColor(rightOf(node), RED);
                 }
+                break;
             }
 
         }
@@ -257,11 +263,52 @@ public class RedBlackBST<T> {
     }
 
     private void deleteNode(Node<T> node) {
-        Node<T> child = node.left == null ? node.right : root.left;
-        if (root == node && root.left == null && root.right == null) {
+        if (node == root && leftOf(node) == null && rightOf(node) == null) {
             root = null;
-        } else if (root == node) {
+        } else {
+            //被删除节点有两个孩子,在右孩子的左分支最底端找接替者,找到直接将接替者的值给被删除节点,接替者进入检查逻辑
+            if (leftOf(node) != null && rightOf(node) != null) {
+                Node<T> s = rightOf(node);
+                while (null != leftOf(s)) {
+                    s = leftOf(s);
+                }
+                node.data = s.data;
+                node = s;
+            }
+            Node<T> child = leftOf(node) == null ? rightOf(node) : leftOf(node);
+            //没有孩子节点
+            if (null == child) {
+                //被删除节点是黑色
+                if (colorOf(node) == BLACK) {
+                    fixUpAfterDeletion(node);
+                }
+                if (node == leftOf(parentOf(node))) {
+                    parentOf(node).left = null;
+                } else {
+                    parentOf(node).right = null;
+                }
+                node.parent = null;
+            } else { //有一个孩子节点
+                child.parent = node.parent;
+                if (node.parent == null) {
+                    root = child;
+                } else if (node == leftOf(parentOf(node))) {
+                    parentOf(node).left = child;
+                } else {
+                    parentOf(node).right = child;
+                }
+                node.left = node.right = node.parent = null;
+                //被删除节点是黑色 注意:被删除节点有一个孩子节点的情况,则被删除节点不可能是红色
+                if (colorOf(node) == BLACK) {
+                    fixUpAfterDeletion(child);
+                }
+
+            }
         }
+
+    }
+
+    private void fixUpAfterDeletion(Node<T> t) {
 
     }
 
