@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * Created by Idroton on 2018/9/8 4:21 PM.
  */
-public class Console {
+public class Out {
     private static final DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
 
@@ -19,7 +19,7 @@ public class Console {
         String dateLong = lockFormat();
         for (int i = 1; i < elements.length; i++) {
             StackTraceElement element = elements[i];
-            if (!element.getClassName().endsWith(".Console")) {
+            if (!element.getClassName().endsWith(".Out")) {
                 String s = MesgFormatter.format("{} CONSOLE [{}] {}:{} - {}", dateLong, Thread.currentThread().getName(), element.getClassName(), element.getLineNumber(), pattern);
                 MesgFormatter.println(s, args);
                 break;

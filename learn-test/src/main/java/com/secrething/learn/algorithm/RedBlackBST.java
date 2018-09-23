@@ -1,7 +1,7 @@
 package com.secrething.learn.algorithm;
 
 import com.secrething.common.contants.ConsoleColor;
-import com.secrething.common.util.Console;
+import com.secrething.common.util.Out;
 
 import java.util.Comparator;
 import java.util.Queue;
@@ -99,11 +99,11 @@ public class RedBlackBST<T> {
                 System.out.println();
             }
             if (node.color == RED) {
-                Console.print(node.data, ConsoleColor.RED);
+                Out.print(node.data, ConsoleColor.RED);
             } else {
-                Console.print(node.data);
+                Out.print(node.data);
             }
-            Console.print("\t");
+            Out.print("\t");
             if (null != leftOf(node))
                 queue.add(node.left);
             if (null != rightOf(node))
@@ -368,18 +368,20 @@ public class RedBlackBST<T> {
             if (x == leftOf(parentOf(x))) {
                 Node<T> sib = rightOf(parentOf(x));
 
+                //兄弟节点是红色,一顿操作变黑色
                 if (colorOf(sib) == RED) {
                     setColor(sib, BLACK);
                     setColor(parentOf(x), RED);
                     rotateLeft(rightOf(parentOf(x)));
                     sib = rightOf(parentOf(x));
                 }
-
+                //兄弟节点的左右孩子都是黑色,一顿操作,父亲接力向上递归(只有这种情况需要递归)
                 if (colorOf(leftOf(sib)) == BLACK &&
                         colorOf(rightOf(sib)) == BLACK) {
                     setColor(sib, RED);
                     x = parentOf(x);
                 } else {
+                    //兄弟节点的右孩子是黑色,左孩子是一定是红色 一顿操作,将兄弟旋转着色为红色
                     if (colorOf(rightOf(sib)) == BLACK) {
                         setColor(leftOf(sib), BLACK);
                         setColor(sib, RED);
@@ -392,7 +394,8 @@ public class RedBlackBST<T> {
                     rotateLeft(rightOf(parentOf(x)));
                     x = root;
                 }
-            } else { // symmetric
+            } else {
+                //以上操作 左右方向相反,仅此而已
                 Node<T> sib = leftOf(parentOf(x));
 
                 if (colorOf(sib) == RED) {

@@ -1,6 +1,6 @@
 package com.secrething.learn.test;
 
-import com.secrething.common.util.Console;
+import com.secrething.common.util.Out;
 import javassist.*;
 
 import java.util.ServiceLoader;
@@ -31,10 +31,10 @@ public class ByteCodeTest {
         int o = 0Xe;
         int p = 0Xa;
         // 按 位与  0010 & 1101 = 0/  1010 & 1101 = 1000;
-        Console.log(p );
+        Out.log(p );
     }
     static void testServiceLoader(){
-        Console.log("{}",ServiceLoader.class.getClassLoader());
+        Out.log("{}",ServiceLoader.class.getClassLoader());
     }
     static void testByteCode() throws Exception{
         String clzzName = "com.secrething.learn.test.HelloWorld";

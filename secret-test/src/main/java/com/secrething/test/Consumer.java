@@ -1,6 +1,6 @@
 package com.secrething.test;
 
-import com.secrething.common.util.Console;
+import com.secrething.common.util.Out;
 import com.secrething.rpc.proxy.JDKProxyFactory;
 import com.secrething.rpc.remote.netty.NettyClient;
 import org.slf4j.Logger;
@@ -20,7 +20,7 @@ public class Consumer {
 
         for (int i = 0; i < 5 ; i++) {
             String s = helloService.hello("zhangsan"+i);
-            Console.log(s);
+            Out.log(s);
             TimeUnit.SECONDS.sleep(1);
         }
     }

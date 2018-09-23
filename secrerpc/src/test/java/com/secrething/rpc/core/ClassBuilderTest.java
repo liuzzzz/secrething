@@ -1,6 +1,6 @@
 package com.secrething.rpc.core;
 
-import com.secrething.common.util.Console;
+import com.secrething.common.util.Out;
 import org.junit.Test;
 
 /**
@@ -22,7 +22,7 @@ public class ClassBuilderTest {
         builder.addInterface(HelloService.class);
         Class<?> clzz = builder.toClass();
         HelloService helloService = (HelloService) clzz.getConstructor().newInstance();
-        Console.log(helloService.hello("zhangsan"));
+        Out.log(helloService.hello("zhangsan"));
        /* ClassPool classPool = new ClassPool(null);
         classPool.appendSystemPath();
         //classPool.appendClassPath("com.secrething.learn.algorithm");
