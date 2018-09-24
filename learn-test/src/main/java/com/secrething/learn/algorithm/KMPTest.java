@@ -26,7 +26,6 @@ public class KMPTest {
 
         int[] tab = new int[arr.length];
         tab[0] = -1;
-        tab[1] = 0;
         int l = 0;
         for (int i = 1; i < arr.length; i++) {
             while (l >0 && arr[i] != arr[l]){
