@@ -413,6 +413,7 @@ public class RedBlackBST<T> {
                     if (colorOf(leftOf(sib)) == BLACK) {
                         setColor(rightOf(sib), BLACK);
                         setColor(sib, RED);
+
                         rotateLeft(rightOf(sib));
                         sib = leftOf(parentOf(x));
                     }
