@@ -1,6 +1,7 @@
 package com.secrething.learn.algorithm;
 
 import java.util.Comparator;
+import java.util.TreeMap;
 
 /**
  * Created by liuzz on 2018/9/14 8:46 PM.
@@ -24,13 +25,12 @@ public class RedBlackBST<T> {
     }
 
     public static void main(String[] args) {
-        RedBlackBST<Integer> brt = new RedBlackBST<>(((o1, o2) -> o2 - o1));
-
-        for (int i = 0; i < 10; i++) {
-            brt.insert(i);
+        //RedBlackBST<Integer> brt = new RedBlackBST<>(((o1, o2) -> o2 - o1));
+        TreeMap<Integer,Integer> map = new TreeMap<>();
+        for (int i = 0; i < 100; i++) {
+            map.put(i,i);
         }
-
-        brt.traversing(brt.root);
+        System.out.println(map);
         /*long begin = System.currentTimeMillis();
         brt.search(brt.root,9999999);
         System.out.println(System.currentTimeMillis() - begin);
@@ -233,7 +233,9 @@ public class RedBlackBST<T> {
         Node<T> child = node.left == null ? node.right : root.left;
         if (root == node && root.left == null && root.right == null) {
             root = null;
-        }else if (root == node ){}
+        }else{
+
+        }
 
     }
 
