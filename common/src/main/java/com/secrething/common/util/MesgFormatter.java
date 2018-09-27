@@ -52,4 +52,7 @@ public abstract class MesgFormatter {
     public static final void println(String pattern, Object... params) {
         System.out.println(format(pattern, params));
     }
+    public static final void print(String pattern, Object... params) {
+        System.out.print(format(pattern, params));
+    }
 }

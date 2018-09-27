@@ -1,7 +1,7 @@
 package com.secrething.learn.test;
 
 import com.secrething.common.util.Assert;
-import com.secrething.common.util.console;
+import com.secrething.common.util.Out;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -17,9 +17,9 @@ public class RandomRWFileTest {
         File file = new File("/Users/liuzz58/Desktop/work/jiequ.log");
         Assert.isTrue(file.exists());
         RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
-        console.log(randomAccessFile.readLine());
+        Out.log(randomAccessFile.readLine());
         FileDescriptor descriptor = randomAccessFile.getFD();
-        console.log(descriptor);
+        Out.log(descriptor);
 
     }
 }
