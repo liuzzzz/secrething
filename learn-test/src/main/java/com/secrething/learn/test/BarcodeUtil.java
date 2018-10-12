@@ -17,6 +17,22 @@ import java.util.List;
  */
 public class BarcodeUtil {
 
+    static List<Prefix> prefixes = new ArrayList<>();
+
+    static {
+        prefixes.add(new Prefix("8019", 14));
+        prefixes.add(new Prefix("6691", 8));
+        prefixes.add(new Prefix("3378", 9));
+        prefixes.add(new Prefix("7700", 9));
+        prefixes.add(new Prefix("3833", 9));
+        prefixes.add(new Prefix("3831", 9));
+        prefixes.add(new Prefix("3943", 9));
+        prefixes.add(new Prefix("7510", 10));
+        prefixes.add(new Prefix("5412", 10));
+        prefixes.add(new Prefix("3379", 10));
+        //0,1,2-6,7-9
+    }
+
     /**
      * 生成文件
      *
@@ -122,7 +138,7 @@ public class BarcodeUtil {
                 newWidth += images[i].getWidth();
             } else if (type == 2) {// 纵向
                 newWidth = newWidth > images[i].getWidth() ? newWidth : images[i].getWidth();
-                newHeight += images[i].getHeight() + 20;
+                newHeight += images[i].getHeight() + 50;
             }
         }
         if (type == 1 && newWidth < 1) {
@@ -144,7 +160,7 @@ public class BarcodeUtil {
                     width_i += images[i].getWidth();
                 } else if (type == 2) {
                     ImageNew.setRGB(0, height_i, newWidth, images[i].getHeight(), ImageArrays[i], 0, newWidth);
-                    height_i += images[i].getHeight() + 20;
+                    height_i += images[i].getHeight() + 50;
                 }
             }
             //输出想要的图片
@@ -156,34 +172,79 @@ public class BarcodeUtil {
     }
 
     public static void main(String[] args) {
-        long l = 3999760580591L;
+        createBarcode();
 
-        List<String[]> list = new ArrayList<>();
+    }
+
+    private static void createBarcode() {
         String[] sarr = new String[50];
-        list.add(sarr);
         int idx = 0;
-        for (int i = 1; i < 10001; i++) {
-            long rad = (long) (Math.random() * 100000);
+        int j = 1;
+        int index = (int) randomRange(0, 9);
+        for (int i = 1; i < 60001; i++) {
             String path = "/Users/liuzz58/Desktop/barcode/barcode{}.png";
             String fileName = MesgFormatter.format(path, i);
-            long ms = l + rad;
-            generateFile(String.valueOf(ms), fileName);
+            String code = generatorCode(index);
+            generateFile(code, fileName);
             if (idx > 49) {
                 idx = 0;
                 sarr = new String[50];
-                list.add(sarr);
+                j++;
             }
             sarr[idx] = fileName;
+            if (idx == 49) {
+                MesgFormatter.println("够50了,merge 一把");
+                mergeImage(sarr, 2, "/Users/liuzz58/Desktop/barcode_group/barcode" + j + ".png");
+                for (int k = 0; k < sarr.length; k++) {
+                    File file = new File(sarr[k]);
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                }
+                index = (int) randomRange(0, 9);
+            }else {
+                index = randomIndex(index);
+            }
             idx++;
-            MesgFormatter.println("create {} barcode",i);
+            MesgFormatter.println("create index {} barcode{}", index,i);
         }
-        int j = 1;
-        for (String[] arr : list) {
-            mergeImage(arr, 2, "/Users/liuzz58/Desktop/barcode_group/barcode" + j + ".png");
-            MesgFormatter.println("merge {} barcode",j);
-            j++;
-        }
-        //mergeImage(list.toArray(new String[]{}),2,"/Users/liuzz58/Desktop/barcode/barcode1_10.png");
+    }
 
+    private static int randomIndex(int lastIndex) {
+        if (lastIndex == 0) {
+            return lastIndex;
+        } else if (lastIndex == 1) {
+            return 1;
+        } else if (lastIndex > 1 && lastIndex < 7) {
+            return (int) randomRange(2, 6);
+        } else {
+            return (int) randomRange(7, 9);
+        }
+    }
+
+    private static long randomRange(long min, long max) {
+        return (long) (Math.random() * (max - min + 1) + min);
+    }
+
+    private static String generatorCode(int index) {
+        Prefix p = prefixes.get(index);
+        String prefix = p.prefix;
+        int count = p.suffix;
+        long l = 1;
+        for (int k = 1; k < count; k++) {
+            l = l * 10;
+        }
+        long suffix = randomRange(l + 1, l * 10 - 1);
+        return prefix + suffix;
+    }
+
+    private static class Prefix {
+        String prefix;
+        int suffix;
+
+        public Prefix(String prefix, int suffix) {
+            this.prefix = prefix;
+            this.suffix = suffix;
+        }
     }
 }
