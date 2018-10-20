@@ -1,6 +1,9 @@
 package com.secrething.learn.test;
 
 import com.secrething.common.util.MesgFormatter;
+import com.secrething.common.util.Out;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.krysalis.barcode4j.impl.code39.Code39Bean;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
@@ -9,8 +12,7 @@ import org.krysalis.barcode4j.tools.UnitConv;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by liuzz on 2018/10/10 2:46 PM.
@@ -171,18 +173,36 @@ public class BarcodeUtil {
         }
     }
 
-    public static void main(String[] args) {
-        createBarcode();
+    public static void main(String[] args) throws Exception {
+        //createBarcode();
+        File csv1 = new File(Desktop+"2.csv");
+        List<String> list = new ArrayList<>();
+        list.addAll(readCSV(csv1));
+        Map<Integer,List<String>> map = new HashMap<>();
+        for (String s : list) {
+            Integer len = s.length();
+            List<String> l = map.get(len);
+            if (null == l){
+                l = new ArrayList<>();
+                map.put(len,l);
+            }
+            l.add(s);
+        }
+        for (List<String> value : map.values()) {
+            createBarcodeBylist(value);
+        }
+
 
     }
-
+    static final String Desktop = "/Users/Idroton/Desktop/";
+    static final String path = "/Users/Idroton/Desktop/barcode/barcode{}.png";
+    static final String targetFile = "/Users/Idroton/Desktop/barcode_group/barcode{}.png";
     private static void createBarcode() {
         String[] sarr = new String[50];
         int idx = 0;
         int j = 1;
         int index = (int) randomRange(0, 9);
         for (int i = 1; i < 60001; i++) {
-            String path = "/Users/liuzz58/Desktop/barcode/barcode{}.png";
             String fileName = MesgFormatter.format(path, i);
             String code = generatorCode(index);
             generateFile(code, fileName);
@@ -194,7 +214,7 @@ public class BarcodeUtil {
             sarr[idx] = fileName;
             if (idx == 49) {
                 MesgFormatter.println("够50了,merge 一把");
-                mergeImage(sarr, 2, "/Users/liuzz58/Desktop/barcode_group/barcode" + j + ".png");
+                mergeImage(sarr, 2, MesgFormatter.format(targetFile,j));
                 for (int k = 0; k < sarr.length; k++) {
                     File file = new File(sarr[k]);
                     if (file.exists()) {
@@ -209,6 +229,7 @@ public class BarcodeUtil {
             MesgFormatter.println("create index {} barcode{}", index,i);
         }
     }
+
 
     private static int randomIndex(int lastIndex) {
         if (lastIndex == 0) {
@@ -246,5 +267,74 @@ public class BarcodeUtil {
             this.prefix = prefix;
             this.suffix = suffix;
         }
+    }
+    static int j = 1;
+    private static void createBarcodeBylist(List<String> codes) {
+        String[] sarr = new String[50];
+        int idx = 0;
+
+        int index = (int) randomRange(0, 9);
+        for (int i = 1; i < codes.size()+1; i++) {
+            try {
+                String code = codes.get(i-1);
+                String fileName = MesgFormatter.format(path, code);
+                generateFile(code, fileName);
+                if (idx > 49) {
+                    idx = 0;
+                    sarr = new String[50];
+                    j++;
+                }
+                sarr[idx] = fileName;
+                if (idx == 49) {
+                    MesgFormatter.println("够50了,merge 一把");
+                    mergeImage(sarr, 2, MesgFormatter.format(targetFile,j));
+                    for (int k = 0; k < sarr.length; k++) {
+                        File file = new File(sarr[k]);
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                    }
+                    index = (int) randomRange(0, 9);
+                }else {
+                    if (i == codes.size()){
+                        String[] little = new String[idx+1];
+                        System.arraycopy(sarr,0,little,0,little.length);
+                        sarr = little;
+                        MesgFormatter.println("不够50,但是没码了,merge 一把");
+                        mergeImage(sarr, 2, MesgFormatter.format(targetFile,j));
+                        for (int k = 0; k < sarr.length; k++) {
+                            File file = new File(sarr[k]);
+                            if (file.exists()) {
+                                file.delete();
+                            }
+                        }
+                    }
+                    index = randomIndex(index);
+                }
+                idx++;
+                MesgFormatter.println("create index {} barcode{}", index,i);
+            }catch (Exception e){
+                Out.log(Arrays.toString(sarr));
+                return;
+            }
+
+        }
+    }
+    private static List<String> readCSV(File file) throws Exception {
+        List<String> nums = new ArrayList<>();
+        if (file.getName().endsWith(".csv")){
+            Reader in = new FileReader(file);
+            Iterable<CSVRecord> records = CSVFormat.RFC4180.withHeader("No").parse(in);
+            boolean head = true;
+            for (CSVRecord record : records) {
+               if (head){
+                  head = false;
+               }else {
+                   nums.add(record.get("No"));
+               }
+            }
+            in.close();
+        }
+        return nums;
     }
 }
