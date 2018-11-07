@@ -10,19 +10,9 @@ public class ClassBuilderTest {
 
     @Test
     public void toClass() throws Exception{
-        String clzzName = "com.secrething.rpc.core.HelloWorld";
+       test1();
 
-        String helloMehodCode = "public String hello(String name) {" +
-                "return \"hello :\" + name;" +
-                "}";
-        //pool
-        ClassBuilder builder = new ClassBuilder();
-        builder.clazz(clzzName);
-        builder.addMethod(helloMehodCode);
-        builder.addInterface(HelloService.class);
-        Class<?> clzz = builder.toClass();
-        HelloService helloService = (HelloService) clzz.getConstructor().newInstance();
-        Out.log(helloService.hello("zhangsan"));
+
        /* ClassPool classPool = new ClassPool(null);
         classPool.appendSystemPath();
         //classPool.appendClassPath("com.secrething.learn.algorithm");
@@ -49,5 +39,37 @@ public class ClassBuilderTest {
         HelloService hello = (HelloService) clzz.getConstructor().newInstance();
         hello.hello();*/
     }
+    public void test1() throws Exception{
+        for (int i = 0; i <2 ; i++) {
+            String clzzName = "com.secrething.rpc.core.HelloWorld";
 
+            String helloMehodCode = "public String hello(String name) {" +
+                    "return \"hello :\" + name;" +
+                    "}";
+            //pool
+            ClassLoader loader = new MyLoader();
+            ClassBuilder builder = new ClassBuilder(loader);
+            builder.clazz(clzzName);
+            builder.addMethod(helloMehodCode);
+            builder.addInterface(HelloService.class);
+            Class<?> clzz = builder.toClass();
+            HelloService helloService = (HelloService) clzz.getConstructor().newInstance();
+            Out.log(helloService.hello("zhangsan"));
+            loader = null;
+            builder = null;
+            clzz = null;
+            clzzName = null;
+            helloService = null;
+            System.gc();
+            Thread.sleep(5000);
+
+        }
+    }
+    private static class MyLoader extends ClassLoader{
+        @Override
+        protected void finalize() throws Throwable {
+            super.finalize();
+            Out.log("gc###");
+        }
+    }
 }

@@ -194,9 +194,10 @@ public class BarcodeUtil {
 
 
     }
-    static final String Desktop = "/Users/Idroton/Desktop/";
-    static final String path = "/Users/Idroton/Desktop/barcode/barcode{}.png";
-    static final String targetFile = "/Users/Idroton/Desktop/barcode_group/barcode{}.png";
+    static final String User = "liuzz58";
+    static final String Desktop = "/Users/"+User+"/Desktop/";
+    static final String path = "/Users/"+User+"/Desktop/barcode/barcode{}.png";
+    static final String targetFile = "/Users/"+User+"/Desktop/barcode_group/barcode{}.png";
     private static void createBarcode() {
         String[] sarr = new String[50];
         int idx = 0;

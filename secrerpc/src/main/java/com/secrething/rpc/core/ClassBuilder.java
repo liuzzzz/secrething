@@ -27,6 +27,11 @@ public class ClassBuilder {
             return cp;
         });
     }
+    public ClassBuilder(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+        this.classPool = new ClassPool(true);
+        classPool.appendClassPath(new LoaderClassPath(classLoader));
+    }
 
     public ClassBuilder clazz(String className) {
         this.className = className;

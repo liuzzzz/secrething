@@ -1,7 +1,5 @@
 package com.secrething.learn.algorithm;
 
-import java.util.Arrays;
-
 /**
  * Created by Idroton on 2018/9/24 4:02 PM.
  */
@@ -59,6 +57,7 @@ public class KMPTest {
     }
     public static void main(String[] args) {
        // System.out.println(kmpMatch("abcab","cab"));
-        System.out.println(Arrays.toString(buildTab("abcdabe".toCharArray())));
+        //System.out.println(Arrays.toString(buildTab("abcdabe".toCharArray())));
+        System.out.println(Thread.currentThread().getId());
     }
 }

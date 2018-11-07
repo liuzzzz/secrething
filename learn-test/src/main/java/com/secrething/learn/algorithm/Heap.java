@@ -49,7 +49,7 @@ public class Heap {
         //heap.sort();
         arr[6] = 1;
         //heap.swap(0,6);
-        heap.siftUpWhild(arr.length, 6);
+        heap.siftUpWhile(arr.length, 6);
         System.out.println(Arrays.toString(arr));
 
     }
@@ -119,7 +119,7 @@ public class Heap {
         }
     }
 
-    private void siftUpWhild(int len, int in) {
+    private void siftUpWhile(int len, int in) {
         int idx = in;
         while (idx < len && idx > 0) {
             int p = parent(idx);
