@@ -37,6 +37,10 @@ public class ClassBuilder {
         this.className = className;
         return this;
     }
+    public ClassBuilder importPackage(String packagePath){
+        this.classPool.importPackage(packagePath);
+        return this;
+    }
 
     public ClassBuilder addConstructor(String constructorCode) {
         if (null == constructors) {

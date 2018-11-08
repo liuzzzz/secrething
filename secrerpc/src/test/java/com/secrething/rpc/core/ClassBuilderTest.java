@@ -43,23 +43,31 @@ public class ClassBuilderTest {
         for (int i = 0; i <2 ; i++) {
             String clzzName = "com.secrething.rpc.core.HelloWorld";
 
-            String helloMehodCode = "public String hello(String name) {" +
-                    "return \"hello :\" + name;" +
+            String helloMehodCode = "public List hello(String name) " +
+                    "{" +
+                        "List list = new ArrayList();"+
+                        "list.add(name);"+
+                        "return list;" +
                     "}";
             //pool
+            //String finalize = "protected void finalize() throws Throwable { System.out.println(\"class gc\"); }";
             ClassLoader loader = new MyLoader();
             ClassBuilder builder = new ClassBuilder(loader);
             builder.clazz(clzzName);
             builder.addMethod(helloMehodCode);
+            builder.importPackage("java.util.List");
+            builder.importPackage("java.util.ArrayList");
+            //builder.addMethod(finalize);
             builder.addInterface(HelloService.class);
             Class<?> clzz = builder.toClass();
             HelloService helloService = (HelloService) clzz.getConstructor().newInstance();
-            Out.log(helloService.hello("zhangsan"));
+            Out.log(helloService.hello("zhangsan").size());
             loader = null;
             builder = null;
             clzz = null;
             clzzName = null;
             helloService = null;
+            System.gc();
             System.gc();
             Thread.sleep(5000);
 

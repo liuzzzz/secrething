@@ -12,7 +12,10 @@ public class Heap {
     private static final boolean MAX = true;
     private final int[] arr;
     private final boolean type;
-
+    public Heap(){
+        arr = null;
+        type = false;
+    }
     private Heap(int[] arr, boolean type) {
         this.arr = arr;
         this.type = type;
