@@ -43,11 +43,9 @@ public class ClassBuilderTest {
         for (int i = 0; i <2 ; i++) {
             String clzzName = "com.secrething.rpc.core.HelloWorld";
 
-            String helloMehodCode = "public List hello(String name) " +
+            String helloMehodCode = "public java.util.List hello(String name) " +
                     "{" +
-                        "List list = new ArrayList();"+
-                        "list.add(name);"+
-                        "return list;" +
+                        "return new java.util.ArrayList();" +
                     "}";
             //pool
             //String finalize = "protected void finalize() throws Throwable { System.out.println(\"class gc\"); }";
@@ -55,8 +53,7 @@ public class ClassBuilderTest {
             ClassBuilder builder = new ClassBuilder(loader);
             builder.clazz(clzzName);
             builder.addMethod(helloMehodCode);
-            builder.importPackage("java.util.List");
-            builder.importPackage("java.util.ArrayList");
+            //builder.importPackage("java.util");
             //builder.addMethod(finalize);
             builder.addInterface(HelloService.class);
             Class<?> clzz = builder.toClass();

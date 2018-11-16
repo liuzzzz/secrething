@@ -8,11 +8,11 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by liuzz on 2018/11/8 下午3:10.
  */
-public class URLClassLoader extends ClassLoader {
+public class MyClassLoader extends ClassLoader {
 
 
     public static void main(String[] args) throws Exception{
-        URLClassLoader loader = new URLClassLoader();
+        MyClassLoader loader = new MyClassLoader();
         File file = new File("/Users/liuzz58/Desktop/Heap.class");
         FileInputStream fis = new FileInputStream(file);
         byte[] bytes = new byte[fis.available()];
