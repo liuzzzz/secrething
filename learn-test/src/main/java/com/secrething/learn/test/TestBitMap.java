@@ -66,7 +66,7 @@ public class TestBitMap {
         }else if (set1.size() == 1){
             return "B\n"+set1.iterator().next();
         }else {
-            return "C\n"+set1.size()+"\n"+set1.stream().sorted().collect(Collectors.joining("-"));
+            return "\nC"+set1.size()+"\n"+set1.stream().sorted().collect(Collectors.joining("-"));
         }
 
     }

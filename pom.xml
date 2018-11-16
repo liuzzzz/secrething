@@ -13,6 +13,8 @@
         <module>protocol</module>
         <module>secret-test</module>
         <module>learn-test</module>
+        <module>adrift-parent</module>
+        <module>demo</module>
     </modules>
     <packaging>pom</packaging>
     <properties>
