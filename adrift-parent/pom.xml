@@ -14,5 +14,4 @@
         <module>adrift-client</module>
         <module>adrift-server</module>
     </modules>
-
 </project>
