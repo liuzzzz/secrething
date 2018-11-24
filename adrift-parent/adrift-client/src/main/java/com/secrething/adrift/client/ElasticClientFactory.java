@@ -3,19 +3,18 @@ package com.secrething.adrift.client;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.secrething.common.core.Record;
 import org.apache.http.HttpHost;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.VersionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 
 public class ElasticClientFactory {
@@ -87,28 +86,33 @@ public class ElasticClientFactory {
         return type;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         testIndex();
     }
-    public static void testIndex() throws IOException {
-        Map<String, Object> upData = Maps.newHashMap();
-        upData.put("cvid", Long.parseLong("100982689830924"));
-        upData.put("score", 0.000010849709462863433);
-        upData.put("sex", 12);
-        upData.put("age", 222);
-        upData.put("degree", 1);
-        upData.put("workyear", 0);
-        upData.put("disableendtime", -1);
-
+    public static void testIndex() throws IOException, InterruptedException {
+        Message m = new Message();
+        m.setName("张三");
+        m.setContent("hello 张三");
+        Record record = Record.build(m);
+        BulkRequest bulkRequest = new BulkRequest();
         IndexRequest req = new IndexRequest();
-        req.index("secrething_test");
-        req.type("recall");
-        req.id("JTeZDWEBbUxacCBFhXmb").source(upData).version(System.currentTimeMillis())
-                .versionType(VersionType.EXTERNAL);
-        IndexResponse insertBuilder = client.index(req);
-        System.out.println(insertBuilder.toString());
+        req.index(record.getIndex());
+        req.type(record.getType());
+        req.id(record.getId()).source(record.getSource());
+        bulkRequest.add(req);
+        Message m1 = new Message();
+        m1.setName("李四");
+        m1.setContent("hello 李四");
+        Record record1 = Record.build(m1);
+        IndexRequest req1 = new IndexRequest();
+        req1.index(record1.getIndex());
+        req1.type(record1.getType());
+        req1.id(record1.getId()).source(record1.getSource());
+        bulkRequest.add(req1);
+        BulkResponse insertBuilder1= client.bulk(bulkRequest);
+        System.out.println(insertBuilder1);
 
-        System.out.println(insertBuilder.status());
+
 
     }
 }
