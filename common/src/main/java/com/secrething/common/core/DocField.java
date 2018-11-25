@@ -6,9 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by liuzz on 2018/11/25 上午12:34.
+ * Created by liuzengzeng on 2018-11-25.
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface IdField {
+public @interface DocField {
+
+    String key() default "";
 }

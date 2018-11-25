@@ -43,7 +43,7 @@ public abstract class MapWriter {
 
                     Field[] fields = clzz.getDeclaredFields();
                     for (Field f : fields) {
-                        toMapBuilder.append(build(f,clzz));
+                        toMapBuilder.append(build(f, clzz));
                     }
                     toMapBuilder.append("}");
                     toMapBuilder.append("return m;");
@@ -57,7 +57,7 @@ public abstract class MapWriter {
             }
         }
 
-         return writer;
+        return writer;
 
     }
 
@@ -65,7 +65,15 @@ public abstract class MapWriter {
     }
 
     private static String build(Field f, Class clzz) throws NoSuchMethodException {
+        DocField e = f.getAnnotation(DocField.class);
+        if (null == e){
+            return "";
+        }
         String fName = f.getName();
+        String key =fName;
+        if (!isBlank(e.key())){
+            key = e.key();
+        }
         String getName = fName.substring(0, 1).toUpperCase() + fName.substring(1);
         String methodName;
         if (f.getType() == boolean.class || f.getType() == Boolean.class) {
@@ -99,12 +107,21 @@ public abstract class MapWriter {
         } else if (f.getType() == byte.class) {
             put = "Byte.valueOf(obj." + methodName + "())";
         }
-        if (f.isAnnotationPresent(IdField.class)) {
-            return "m.put(\"id\"," + put + ");";
-        } else {
-            return "m.put(\"" + fName + "\"," + put + ");";
+        return "m.put(\"" + key + "\"," + put + ");";
 
+    }
+
+    private static boolean isBlank(CharSequence cs) {
+        int strLen;
+        if (cs == null || (strLen = cs.length()) == 0) {
+            return true;
         }
+        for (int i = 0; i < strLen; i++) {
+            if (!Character.isWhitespace(cs.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static String getString(Class clzz, String getName) {
