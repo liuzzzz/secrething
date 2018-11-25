@@ -33,6 +33,7 @@
         <commons-beanutils.version>1.9.3</commons-beanutils.version>
         <commons-degester.version>1.8</commons-degester.version>
         <easymoc.version>3.5.1</easymoc.version>
+        <elasticsearch.version>6.2.0</elasticsearch.version>
         <junit.version>4.12</junit.version>
         <email.version>1.6.0</email.version>
         <cfx.version>3.1.0</cfx.version>
@@ -45,6 +46,11 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-high-level-client</artifactId>
+                <version>${elasticsearch.version}</version>
             </dependency>
             <dependency>
                 <groupId>de.ruedigermoeller</groupId>
@@ -113,7 +119,7 @@
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
-                <version>1.1.35</version>
+                <version>1.2.47</version>
             </dependency>
             <dependency>
                 <groupId>org.aspectj</groupId>
