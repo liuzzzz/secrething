@@ -41,7 +41,9 @@ public abstract class MapWriter {
                     StringBuilder toMapBuilder = new StringBuilder("java.util.Map toMap(Object o) throws Exception{");
                     StringBuilder parseBuilder = new StringBuilder("Object parseObject(java.util.Map map) throws Exception{");
                     parseBuilder.append(objClassName).append(" obj = new ").append(objClassName).append("();");
+                    parseBuilder.append("if(null == map){return obj;}");
                     toMapBuilder.append("java.util.HashMap m = new java.util.HashMap();");
+                    toMapBuilder.append("if(null == o){return m;}");
                     toMapBuilder.append("if(o instanceof " + objClassName + "){");
                     toMapBuilder.append(objClassName).append(" obj = (" + objClassName + ")o;");
                     Field[] fields = clzz.getDeclaredFields();

@@ -17,7 +17,7 @@ public class RecordTest {
         r.getSource().put("id",r.getId());
 
 
-        Message mm = MapWriter.parse(r.getSource(),Message.class).get();
+        Message mm = MapWriter.parse(null,Message.class).get();
         System.out.println(m == mm);
     }
 

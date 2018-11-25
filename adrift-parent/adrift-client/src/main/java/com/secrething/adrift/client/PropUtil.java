@@ -14,6 +14,7 @@ import java.util.Properties;
  */
 public class PropUtil {
     private static final Logger log = LoggerFactory.getLogger(PropUtil.class);
+
     private PropUtil() {
         throw new UnsupportedOperationException();
     }
@@ -22,14 +23,14 @@ public class PropUtil {
 
     static {
         try {
-            File f = new File(PropUtil.class.getResource("/").getPath()+"/es.properties");
+            File f = new File(PropUtil.class.getResource("/").getPath() + "/es.properties");
             InputStream is = new FileInputStream(f);
             p.load(is);
             is.close();
             log.info("----------config from cfg.properties start----------");
             log.info("|                                                  |");
-            p.forEach((k,v)->{
-                log.info("\t\t\t{}->{}",k,v);
+            p.forEach((k, v) -> {
+                log.info("\t\t\t{}->{}", k, v);
             });
             log.info("|                                                  |");
             log.info("----------config from cfg.properties end----------");
@@ -46,4 +47,5 @@ public class PropUtil {
     public static void main(String[] args) {
         System.out.println("h");
     }
+
 }
