@@ -1,14 +1,14 @@
 package com.secrething.common.core;
 
-import com.secrething.common.util.ConcurrentHashMap;
-import com.secrething.common.util.ConcurrentMap;
-import com.secrething.common.util.UUIDBuilder;
 import javassist.*;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by liuzz on 2018/11/25 上午12:35.
@@ -17,6 +17,7 @@ public abstract class MapWriter {
     private static final ConcurrentMap<Class, MapWriter> writerCache = new ConcurrentHashMap<>();
     private static final ConcurrentMap<ClassLoader, ClassPool> pools = new ConcurrentHashMap<>();
     private static final AtomicInteger idx = new AtomicInteger(0);
+    private static final AtomicLong suffix = new AtomicLong(0);
 
     static MapWriter getWriter(Class clzz) throws Exception {
         if (Object.class != clzz.getSuperclass() || clzz.getInterfaces().length > 0) {
@@ -28,9 +29,9 @@ public abstract class MapWriter {
             synchronized (writerCache) {
                 writer = writerCache.get(clzz);
                 if (null == writer) {
-                    String clzzName = "com.secrething.common.core.MapWriter$" + idx.getAndIncrement();
+                    String clzzName = MapWriter.class.getName() + "$" + idx.getAndIncrement();
                     ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                    ClassPool classPool = pools.putIfAbsent(loader, (h) -> {
+                    ClassPool classPool = pools.computeIfAbsent(loader, (h) -> {
                         ClassPool pool = new ClassPool(true);
                         pool.appendClassPath(new LoaderClassPath(loader));
                         return pool;
@@ -133,7 +134,7 @@ public abstract class MapWriter {
         String setName = fName.substring(0, 1).toUpperCase() + fName.substring(1);
         String methodName = setString(clzz, setName, f);
         StringBuilder setBuilder = new StringBuilder();
-        String vName = "v_" + UUIDBuilder.genUUID();
+        String vName = "v_" + suffix.getAndIncrement();
         setBuilder.append("Object ").append(vName).append(" = map.get(\"").append(key).append("\");");
         setBuilder.append("if(null != ").append(vName).append("){");
         if (f.getType() == boolean.class) {
