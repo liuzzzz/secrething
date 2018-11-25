@@ -65,7 +65,7 @@ public abstract class MapWriter {
     }
 
     private static String build(Field f, Class clzz) throws NoSuchMethodException {
-        DocField e = f.getAnnotation(DocField.class);
+        Entry e = f.getAnnotation(Entry.class);
         if (null == e){
             return "";
         }

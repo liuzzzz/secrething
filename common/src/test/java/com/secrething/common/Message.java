@@ -1,7 +1,7 @@
 package com.secrething.common;
 
 import com.secrething.common.core.Document;
-import com.secrething.common.core.DocField;
+import com.secrething.common.core.Entry;
 import com.secrething.common.util.UUIDBuilder;
 import lombok.Data;
 
@@ -12,11 +12,11 @@ import lombok.Data;
 @Data
 public class Message {
 
-    @DocField(key = "id")
+    @Entry(key = "id")
     private String uid = UUIDBuilder.genUUID();
 
-    @DocField
+    @Entry
     private String name;
-    @DocField
+    @Entry
     private String content;
 }
