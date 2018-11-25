@@ -13,8 +13,12 @@ public class RecordTest {
         Message m = new Message();
         m.setContent("hello");
         m.setName("secret");
-        Record r = Record.build(m);
-        System.out.println(r);
+        Record r = Record.create(m);
+        r.getSource().put("id",r.getId());
+
+
+        Message mm = MapWriter.parse(r.getSource(),Message.class).get();
+        System.out.println(m == mm);
     }
 
 }

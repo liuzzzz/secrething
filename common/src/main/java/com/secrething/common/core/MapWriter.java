@@ -2,9 +2,12 @@ package com.secrething.common.core;
 
 import com.secrething.common.util.ConcurrentHashMap;
 import com.secrething.common.util.ConcurrentMap;
+import com.secrething.common.util.UUIDBuilder;
 import javassist.*;
 
 import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -15,7 +18,7 @@ public abstract class MapWriter {
     private static final ConcurrentMap<ClassLoader, ClassPool> pools = new ConcurrentHashMap<>();
     private static final AtomicInteger idx = new AtomicInteger(0);
 
-    public static MapWriter getWriter(Class clzz) throws Exception {
+    static MapWriter getWriter(Class clzz) throws Exception {
         if (Object.class != clzz.getSuperclass() || clzz.getInterfaces().length > 0) {
             throw new IllegalArgumentException("clzz super class not support");
         }
@@ -25,7 +28,7 @@ public abstract class MapWriter {
             synchronized (writerCache) {
                 writer = writerCache.get(clzz);
                 if (null == writer) {
-                    String clzzName = "MapWriter$" + idx.getAndIncrement();
+                    String clzzName = "com.secrething.common.core.MapWriter$" + idx.getAndIncrement();
                     ClassLoader loader = Thread.currentThread().getContextClassLoader();
                     ClassPool classPool = pools.putIfAbsent(loader, (h) -> {
                         ClassPool pool = new ClassPool(true);
@@ -35,21 +38,28 @@ public abstract class MapWriter {
                     CtClass ctClass = classPool.makeClass(clzzName);
                     String objClassName = clzz.getName();
                     ctClass.setSuperclass(classPool.get(MapWriter.class.getName()));
-                    StringBuilder toMapBuilder = new StringBuilder("public Object toMap(Object o) throws Exception{");
+                    StringBuilder toMapBuilder = new StringBuilder("java.util.Map toMap(Object o) throws Exception{");
+                    StringBuilder parseBuilder = new StringBuilder("Object parseObject(java.util.Map map) throws Exception{");
+                    parseBuilder.append(objClassName).append(" obj = new ").append(objClassName).append("();");
                     toMapBuilder.append("java.util.HashMap m = new java.util.HashMap();");
                     toMapBuilder.append("if(o instanceof " + objClassName + "){");
                     toMapBuilder.append(objClassName).append(" obj = (" + objClassName + ")o;");
-
-
                     Field[] fields = clzz.getDeclaredFields();
                     for (Field f : fields) {
-                        toMapBuilder.append(build(f, clzz));
+                        toMapBuilder.append(buildGet(f, clzz));
+                        parseBuilder.append(buildSet(f, clzz));
                     }
                     toMapBuilder.append("}");
                     toMapBuilder.append("return m;");
+                    parseBuilder.append("return obj;");
                     toMapBuilder.append("}");
+                    parseBuilder.append("}");
                     CtMethod met = CtNewMethod.make(toMapBuilder.toString(), ctClass);
+                    CtMethod set = CtNewMethod.make(parseBuilder.toString(), ctClass);
                     ctClass.addMethod(met);
+                    ctClass.addMethod(set);
+
+
                     Class<?> clz = ctClass.toClass();
                     writer = (MapWriter) clz.getConstructor().newInstance();
                     writerCache.putIfAbsent(clzz, writer);
@@ -61,17 +71,14 @@ public abstract class MapWriter {
 
     }
 
-    public static void main(String[] args) throws Exception {
-    }
-
-    private static String build(Field f, Class clzz) throws NoSuchMethodException {
+    private static String buildGet(Field f, Class clzz) throws NoSuchMethodException {
         Entry e = f.getAnnotation(Entry.class);
-        if (null == e){
+        if (null == e) {
             return "";
         }
         String fName = f.getName();
-        String key =fName;
-        if (!isBlank(e.key())){
+        String key = fName;
+        if (!isBlank(e.key())) {
             key = e.key();
         }
         String getName = fName.substring(0, 1).toUpperCase() + fName.substring(1);
@@ -111,6 +118,46 @@ public abstract class MapWriter {
 
     }
 
+    private static String buildSet(Field f, Class clzz) throws NoSuchMethodException {
+        Entry e = f.getAnnotation(Entry.class);
+        if (null == e) {
+            return "";
+        }
+        String fName = f.getName();
+        String key = fName;
+        if (!isBlank(e.key())) {
+            key = e.key();
+        }
+        String setName = fName.substring(0, 1).toUpperCase() + fName.substring(1);
+        String methodName = setString(clzz, setName, f);
+        StringBuilder setBuilder = new StringBuilder();
+        String vName = "v_" + UUIDBuilder.genUUID();
+        setBuilder.append("Object ").append(vName).append(" = map.get(\"").append(key).append("\");");
+        setBuilder.append("if(null != ").append(vName).append("){");
+        if (f.getType() == boolean.class) {
+            setBuilder.append("boolean v = Boolean.valueOf(").append(vName).append(".toString()).booleanValue();");
+        } else if (f.getType() == int.class) {
+            setBuilder.append("int v = Integer.valueOf(").append(vName).append(".toString()).intValue();");
+        } else if (f.getType() == short.class) {
+            setBuilder.append("short v = Short.valueOf(").append(vName).append(".toString()).shortValue();");
+        } else if (f.getType() == char.class) {
+            setBuilder.append("char v = Character.valueOf(").append(vName).append(".toString()).charValue();");
+        } else if (f.getType() == long.class) {
+            setBuilder.append("long v = Long.valueOf(").append(vName).append(".toString()).longValue();");
+        } else if (f.getType() == float.class) {
+            setBuilder.append("float v = Float.valueOf(").append(vName).append(".toString()).floatValue();");
+        } else if (f.getType() == double.class) {
+            setBuilder.append("double v = Double.valueOf(").append(vName).append(".toString()).doubleValue();");
+        } else if (f.getType() == byte.class) {
+            setBuilder.append("byte v = Byte.valueOf(").append(vName).append(".toString()).byteValue();");
+        } else {
+            setBuilder.append(f.getType().getName()).append(" v = (").append(f.getType().getName()).append(")").append(vName).append(";");
+        }
+        setBuilder.append("obj.").append(methodName).append("(v);");
+        setBuilder.append("}\n");
+        return setBuilder.toString();
+    }
+
     private static boolean isBlank(CharSequence cs) {
         int strLen;
         if (cs == null || (strLen = cs.length()) == 0) {
@@ -138,5 +185,46 @@ public abstract class MapWriter {
         return methodName;
     }
 
-    public abstract Object toMap(Object obj) throws Exception;
+    private static String setString(Class clzz, String setName, Field f) {
+        String methodName;
+        try {
+            if (null != clzz.getDeclaredMethod("set" + setName, f.getType()))
+                methodName = "set" + setName;
+            else {
+                throw new IllegalArgumentException("method[set" + setName + "(" + f.getType().getName() + ")] not exits");
+            }
+        } catch (NoSuchMethodException ee) {
+            throw new IllegalArgumentException("method[set" + setName + "(" + f.getType().getName() + ")] not exits");
+        }
+        return methodName;
+    }
+
+    public static Optional<Map> map(Object o) {
+        try {
+            return Optional.of(MapWriter.getWriter(o.getClass()).toMap(o));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
+    public static <T> Optional<T> parse(Map map, Class<T> clzz) {
+        try {
+            return Optional.of(MapWriter.getWriter(clzz).toObject(map));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
+    abstract Map toMap(Object obj) throws Exception;
+
+    abstract Object parseObject(Map map) throws Exception;
+
+    @SuppressWarnings("unchecked")
+    <T> T toObject(Map map) throws Exception {
+        return (T) parseObject(map);
+
+    }
+
 }

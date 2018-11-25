@@ -93,7 +93,7 @@ public class ElasticClientFactory {
         Message m = new Message();
         m.setName("张三");
         m.setContent("hello 张三");
-        Record record = Record.build(m);
+        Record record = Record.create(m);
         BulkRequest bulkRequest = new BulkRequest();
         IndexRequest req = new IndexRequest();
         req.index(record.getIndex());
@@ -103,7 +103,7 @@ public class ElasticClientFactory {
         Message m1 = new Message();
         m1.setName("李四");
         m1.setContent("hello 李四");
-        Record record1 = Record.build(m1);
+        Record record1 = Record.create(m1);
         IndexRequest req1 = new IndexRequest();
         req1.index(record1.getIndex());
         req1.type(record1.getType());
