@@ -19,9 +19,6 @@ public abstract class MapWriter {
     private static final AtomicLong suffix = new AtomicLong(0);
 
     static MapWriter getWriter(Class clzz) throws Exception {
-        if (Object.class != clzz.getSuperclass() || clzz.getInterfaces().length > 0) {
-            throw new IllegalArgumentException("clzz super class not support");
-        }
 
         MapWriter writer = writerCache.get(clzz);
         if (null == writer) {
@@ -46,11 +43,17 @@ public abstract class MapWriter {
                     toMapBuilder.append("if(null == o){return m;}");
                     toMapBuilder.append("if(o instanceof " + objClassName + "){");
                     toMapBuilder.append(objClassName).append(" obj = (" + objClassName + ")o;");
-                    Field[] fields = clzz.getDeclaredFields();
-                    for (Field f : fields) {
-                        toMapBuilder.append(buildGet(f, clzz));
-                        parseBuilder.append(buildSet(f, clzz));
+                    Class foreachClass = clzz;
+                    while (foreachClass != Object.class){
+                        Field[] fields = foreachClass.getDeclaredFields();
+                        for (Field f : fields) {
+                            toMapBuilder.append(buildGet(f, foreachClass));
+                            parseBuilder.append(buildSet(f, foreachClass));
+                        }
+                        foreachClass = foreachClass.getSuperclass();
+
                     }
+
                     toMapBuilder.append("}");
                     toMapBuilder.append("return m;");
                     parseBuilder.append("return obj;");

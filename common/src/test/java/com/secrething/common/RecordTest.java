@@ -11,14 +11,14 @@ public class RecordTest {
 
     @Test
     public void testBuild() {
-        Message m = new Message();
+        Hello m = new Hello();
         m.setContent("hello");
         m.setName("secret");
         Record r = Record.create(m);
         r.getSource().put("id", r.getId());
 
 
-        Message mm = MapWriter.parse(r.getSource(), Message.class);
+        Hello mm = MapWriter.parse(r.getSource(), Hello.class);
         System.out.println(mm);
     }
 
