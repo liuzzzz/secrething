@@ -24,7 +24,7 @@ public class Record {
             Record record = new Record();
             record.setIndex(document.index());
             record.setType(document.type());
-            Map s = MapWriter.map(obj);
+            Map<Object,Object> s = MapWriter.map(obj);
             if (null != s) {
                 Object id = s.remove("id");
                 if (StringUtils.isBlank(uid))

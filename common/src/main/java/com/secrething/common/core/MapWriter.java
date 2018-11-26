@@ -44,7 +44,7 @@ public abstract class MapWriter {
                     toMapBuilder.append("if(o instanceof " + objClassName + "){");
                     toMapBuilder.append(objClassName).append(" obj = (" + objClassName + ")o;");
                     Class foreachClass = clzz;
-                    while (foreachClass != Object.class){
+                    while (foreachClass != Object.class) {
                         Field[] fields = foreachClass.getDeclaredFields();
                         for (Field f : fields) {
                             toMapBuilder.append(buildGet(f, foreachClass));
@@ -204,7 +204,8 @@ public abstract class MapWriter {
         return methodName;
     }
 
-    public static Map map(Object o) {
+    @SuppressWarnings("unchecked")
+    public static <K, V> Map<K, V> map(Object o) {
         try {
             return MapWriter.getWriter(o.getClass()).toMap(o);
         } catch (Exception e) {
