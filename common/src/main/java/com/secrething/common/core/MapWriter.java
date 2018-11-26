@@ -4,7 +4,6 @@ import javassist.*;
 
 import java.lang.reflect.Field;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -202,21 +201,21 @@ public abstract class MapWriter {
         return methodName;
     }
 
-    public static Optional<Map> map(Object o) {
+    public static Map map(Object o) {
         try {
-            return Optional.of(MapWriter.getWriter(o.getClass()).toMap(o));
+            return MapWriter.getWriter(o.getClass()).toMap(o);
         } catch (Exception e) {
             e.printStackTrace();
-            return Optional.empty();
+            return null;
         }
     }
 
-    public static <T> Optional<T> parse(Map map, Class<T> clzz) {
+    public static <T> T parse(Map map, Class<T> clzz) {
         try {
-            return Optional.of(MapWriter.getWriter(clzz).toObject(map));
+            return MapWriter.getWriter(clzz).toObject(map);
         } catch (Exception e) {
             e.printStackTrace();
-            return Optional.empty();
+            return null;
         }
     }
 
@@ -225,7 +224,7 @@ public abstract class MapWriter {
     abstract Object parseObject(Map map) throws Exception;
 
     @SuppressWarnings("unchecked")
-    <T> T toObject(Map map) throws Exception {
+    private <T> T toObject(Map map) throws Exception {
         return (T) parseObject(map);
 
     }
