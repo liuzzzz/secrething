@@ -1,6 +1,7 @@
 package com.secrething.common.core;
 
 import javassist.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -12,66 +13,64 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by liuzz on 2018/11/25 上午12:35.
  */
+@Slf4j
 public abstract class MapWriter {
     private static final ConcurrentMap<Class, MapWriter> writerCache = new ConcurrentHashMap<>();
     private static final ConcurrentMap<ClassLoader, ClassPool> pools = new ConcurrentHashMap<>();
     private static final AtomicInteger idx = new AtomicInteger(0);
     private static final AtomicLong suffix = new AtomicLong(0);
 
-    static MapWriter getWriter(Class clzz) throws Exception {
-
-        MapWriter writer = writerCache.get(clzz);
-        if (null == writer) {
-            synchronized (writerCache) {
-                writer = writerCache.get(clzz);
-                if (null == writer) {
-                    String clzzName = MapWriter.class.getName() + "$" + idx.getAndIncrement();
-                    ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                    ClassPool classPool = pools.computeIfAbsent(loader, (h) -> {
-                        ClassPool pool = new ClassPool(true);
-                        pool.appendClassPath(new LoaderClassPath(loader));
-                        return pool;
-                    });
-                    CtClass ctClass = classPool.makeClass(clzzName);
-                    String objClassName = clzz.getName();
-                    ctClass.setSuperclass(classPool.get(MapWriter.class.getName()));
-                    StringBuilder toMapBuilder = new StringBuilder("java.util.Map toMap(Object o) throws Exception{");
-                    StringBuilder parseBuilder = new StringBuilder("Object parseObject(java.util.Map map) throws Exception{");
-                    parseBuilder.append(objClassName).append(" obj = new ").append(objClassName).append("();");
-                    parseBuilder.append("if(null == map){return obj;}");
-                    toMapBuilder.append("java.util.HashMap m = new java.util.HashMap();");
-                    toMapBuilder.append("if(null == o){return m;}");
-                    toMapBuilder.append("if(o instanceof " + objClassName + "){");
-                    toMapBuilder.append(objClassName).append(" obj = (" + objClassName + ")o;");
-                    Class foreachClass = clzz;
-                    while (foreachClass != Object.class) {
-                        Field[] fields = foreachClass.getDeclaredFields();
-                        for (Field f : fields) {
-                            toMapBuilder.append(buildGet(f, foreachClass));
-                            parseBuilder.append(buildSet(f, foreachClass));
-                        }
-                        foreachClass = foreachClass.getSuperclass();
-
+    static MapWriter getWriter(final Class clzz) throws Exception {
+        MapWriter writer = writerCache.computeIfAbsent(clzz, (k) -> {
+            try {
+                String clzzName = MapWriter.class.getName() + "$" + idx.getAndIncrement();
+                ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                ClassPool classPool = pools.computeIfAbsent(loader, (h) -> {
+                    ClassPool pool = new ClassPool(true);
+                    pool.appendClassPath(new LoaderClassPath(loader));
+                    return pool;
+                });
+                CtClass ctClass = classPool.makeClass(clzzName);
+                String objClassName = clzz.getName();
+                ctClass.setSuperclass(classPool.get(MapWriter.class.getName()));
+                StringBuilder toMapBuilder = new StringBuilder("java.util.Map toMap(Object o) throws Exception{");
+                StringBuilder parseBuilder = new StringBuilder("Object parseObject(java.util.Map map) throws Exception{");
+                parseBuilder.append(objClassName).append(" obj = new ").append(objClassName).append("();");
+                parseBuilder.append("if(null == map){return obj;}");
+                toMapBuilder.append("java.util.HashMap m = new java.util.HashMap();");
+                toMapBuilder.append("if(null == o){return m;}");
+                toMapBuilder.append("if(o instanceof " + objClassName + "){");
+                toMapBuilder.append(objClassName).append(" obj = (" + objClassName + ")o;");
+                Class foreachClass = clzz;
+                while (foreachClass != Object.class) {
+                    Field[] fields = foreachClass.getDeclaredFields();
+                    for (Field f : fields) {
+                        toMapBuilder.append(buildGet(f, foreachClass));
+                        parseBuilder.append(buildSet(f, foreachClass));
                     }
+                    foreachClass = foreachClass.getSuperclass();
 
-                    toMapBuilder.append("}");
-                    toMapBuilder.append("return m;");
-                    parseBuilder.append("return obj;");
-                    toMapBuilder.append("}");
-                    parseBuilder.append("}");
-                    CtMethod met = CtNewMethod.make(toMapBuilder.toString(), ctClass);
-                    CtMethod set = CtNewMethod.make(parseBuilder.toString(), ctClass);
-                    ctClass.addMethod(met);
-                    ctClass.addMethod(set);
-
-
-                    Class<?> clz = ctClass.toClass();
-                    writer = (MapWriter) clz.getConstructor().newInstance();
-                    writerCache.putIfAbsent(clzz, writer);
                 }
-            }
-        }
 
+                toMapBuilder.append("}");
+                toMapBuilder.append("return m;");
+                parseBuilder.append("return obj;");
+                toMapBuilder.append("}");
+                parseBuilder.append("}");
+                CtMethod met = CtNewMethod.make(toMapBuilder.toString(), ctClass);
+                CtMethod set = CtNewMethod.make(parseBuilder.toString(), ctClass);
+                ctClass.addMethod(met);
+                ctClass.addMethod(set);
+
+
+                Class<?> clz = ctClass.toClass();
+                return (MapWriter) clz.getConstructor().newInstance();
+            } catch (Exception e) {
+                log.error("MapWriter make error",e);
+                return null;
+            }
+
+        });
         return writer;
 
     }
