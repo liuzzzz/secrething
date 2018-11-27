@@ -1,7 +1,7 @@
 package com.secrething.common;
 
 import com.secrething.common.core.Document;
-import com.secrething.common.core.Entry;
+import com.secrething.common.core.Key;
 import lombok.Data;
 
 /**
@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public class Hello extends Message {
 
-    @Entry
+    @Key
     private boolean test = true;
 
 

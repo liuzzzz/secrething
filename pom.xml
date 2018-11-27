@@ -15,6 +15,7 @@
         <module>learn-test</module>
         <module>adrift-parent</module>
         <module>demo</module>
+        <module>es-util</module>
     </modules>
     <packaging>pom</packaging>
     <properties>

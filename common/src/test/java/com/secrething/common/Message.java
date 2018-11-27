@@ -1,7 +1,7 @@
 package com.secrething.common;
 
 import com.secrething.common.core.Document;
-import com.secrething.common.core.Entry;
+import com.secrething.common.core.Key;
 import com.secrething.common.util.UUIDBuilder;
 import lombok.Data;
 
@@ -14,14 +14,14 @@ import java.util.Objects;
 @Data
 public class Message {
 
-    @Entry(key = "id")
+    @Key("id")
     private String uid = UUIDBuilder.genUUID();
 
-    @Entry
+    @Key
     private String name;
-    @Entry
+    @Key
     private String content;
-    @Entry
+    @Key
     private int len = 20;
 
     @Override

@@ -1,7 +1,6 @@
-package com.secrething.common.core;
+package com.secrething.esutil.core;
 
 import javassist.*;
-import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -13,12 +12,12 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by liuzz on 2018/11/25 上午12:35.
  */
-@Slf4j
 public abstract class MapWriter {
     private static final ConcurrentMap<Class, MapWriter> writerCache = new ConcurrentHashMap<>();
     private static final ConcurrentMap<ClassLoader, ClassPool> pools = new ConcurrentHashMap<>();
     private static final AtomicInteger idx = new AtomicInteger(0);
     private static final AtomicLong suffix = new AtomicLong(0);
+    private static final ThreadLocal<Exception> localCache = new ThreadLocal<>();
 
     static MapWriter getWriter(final Class clzz) throws Exception {
         MapWriter writer = writerCache.computeIfAbsent(clzz, (k) -> {
@@ -45,6 +44,7 @@ public abstract class MapWriter {
                 while (foreachClass != Object.class) {
                     Field[] fields = foreachClass.getDeclaredFields();
                     for (Field f : fields) {
+                        f.getModifiers();
                         toMapBuilder.append(buildGet(f, foreachClass));
                         parseBuilder.append(buildSet(f, foreachClass));
                     }
@@ -66,11 +66,16 @@ public abstract class MapWriter {
                 Class<?> clz = ctClass.toClass();
                 return (MapWriter) clz.getConstructor().newInstance();
             } catch (Exception e) {
-                log.error("MapWriter make error",e);
+                localCache.set(e);
                 return null;
             }
 
         });
+        Exception e = localCache.get();
+        localCache.remove();
+        if (null != e) {
+            throw e;
+        }
         return writer;
 
     }

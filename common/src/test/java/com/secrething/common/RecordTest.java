@@ -1,5 +1,6 @@
 package com.secrething.common;
 
+import com.alibaba.fastjson.JSON;
 import com.secrething.common.core.MapWriter;
 import com.secrething.common.core.Record;
 import org.junit.Test;
@@ -17,9 +18,9 @@ public class RecordTest {
         Record r = Record.create(m);
         r.getSource().put("id", r.getId());
 
-
+        System.out.println(r);
         Hello mm = MapWriter.parse(r.getSource(), Hello.class);
-        System.out.println(mm);
+        System.out.println(JSON.toJSONString(mm));
     }
 
 }
