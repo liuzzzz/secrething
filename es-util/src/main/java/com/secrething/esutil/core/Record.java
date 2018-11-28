@@ -11,6 +11,38 @@ public class Record {
     private String id;
     private Map source;
 
+    @SuppressWarnings("unchecked")
+    public static Record create(Object obj, String uid) {
+        Class clzz = obj.getClass();
+        try {
+            if (!clzz.isAnnotationPresent(Document.class))
+                throw new UnsupportedOperationException("not mark Document");
+            Document document = (Document) clzz.getAnnotation(Document.class);
+            Record record = new Record();
+            record.setIndex(document.index());
+            record.setType(document.type());
+            Map<String, Object> s = MapWriter.map(obj);
+            if (null != s) {
+                Object id = s.remove("id");
+                String setId = uid;
+                if (StringUtils.isBlank(uid) && null != id) {
+                    setId = id.toString();
+                }
+                record.setId(setId);
+                record.setSource(s);
+            }
+            return record;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    public static Record create(Object obj) {
+        return create(obj, null);
+    }
+
     public String getIndex() {
         return index;
     }
@@ -41,35 +73,5 @@ public class Record {
 
     public void setSource(Map source) {
         this.source = source;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Record create(Object obj, String uid) {
-        Class clzz = obj.getClass();
-        try {
-            if (!clzz.isAnnotationPresent(Document.class))
-                throw new UnsupportedOperationException("not mark Document");
-            Document document = (Document) clzz.getAnnotation(Document.class);
-            Record record = new Record();
-            record.setIndex(document.index());
-            record.setType(document.type());
-            Map<String, Object> s = MapWriter.map(obj);
-            if (null != s) {
-                Object id = s.remove("id");
-                if (StringUtils.isBlank(uid) && null != id) {
-                    record.setId(id.toString());
-                }
-                record.setSource(s);
-            }
-            return record;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-
-    }
-
-    public static Record create(Object obj) {
-        return create(obj, null);
     }
 }

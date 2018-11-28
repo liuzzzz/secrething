@@ -1,9 +1,11 @@
 package com.secrething.adrift.client;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.secrething.common.core.Record;
+import com.secrething.esutil.core.MapWriter;
+import com.secrething.esutil.core.Record;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -13,8 +15,13 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 public class ElasticClientFactory {
@@ -26,6 +33,7 @@ public class ElasticClientFactory {
     private static String alias;
     private static String type;
     private static RestHighLevelClient client = ElasticClientHolder.clientInstance;
+
     private ElasticClientFactory() {
     }
 
@@ -89,30 +97,36 @@ public class ElasticClientFactory {
     public static void main(String[] args) throws Exception {
         testIndex();
     }
+
     public static void testIndex() throws IOException, InterruptedException {
-        Message m = new Message();
-        m.setName("张三");
-        m.setContent("hello 张三");
-        Record record = Record.create(m);
-        BulkRequest bulkRequest = new BulkRequest();
-        IndexRequest req = new IndexRequest();
-        req.index(record.getIndex());
-        req.type(record.getType());
-        req.id(record.getId()).source(record.getSource());
-        bulkRequest.add(req);
-        Message m1 = new Message();
-        m1.setName("李四");
-        m1.setContent("hello 李四");
-        Record record1 = Record.create(m1);
-        IndexRequest req1 = new IndexRequest();
-        req1.index(record1.getIndex());
-        req1.type(record1.getType());
-        req1.id(record1.getId()).source(record1.getSource());
-        bulkRequest.add(req1);
-        BulkResponse insertBuilder1= client.bulk(bulkRequest);
-        System.out.println(insertBuilder1);
+        for (int k = 0; k < 9; k++) {
+            File file = new File("/Users/liuzz58/Desktop/logs/msg"+k+".json");
+            BufferedReader fileReader = new BufferedReader(new FileReader(file));
+            String json = fileReader.readLine();
 
+            List<Map> list = JSONObject.parseArray(json, Map.class);
+            List<Record> records = new ArrayList<>(1000);
+            BulkRequest bulkRequest = new BulkRequest();
+            for (int i = 0, j = list.size(); i < j; i++) {
+                Message message = MapWriter.parse(list.get(i),Message.class);
+                Record record = Record.create(message,UUIDBuilder.genUUID());
+                IndexRequest req = new IndexRequest();
+                req.index(record.getIndex());
+                req.type(record.getType());
+                req.id(record.getId()).source(record.getSource());
+                if (i != 0  && i % 1000 == 0){
+                    BulkResponse insertBuilder1 = client.bulk(bulkRequest);
+                    bulkRequest = new BulkRequest();
+                    bulkRequest.add(req);
+                }else {
+                    bulkRequest.add(req);
+                }
+            }
+            if (bulkRequest.numberOfActions() > 0)
+                client.bulk(bulkRequest);
+            System.out.println("Finished:"+k);
+        }
 
-
+        System.exit(1);
     }
 }

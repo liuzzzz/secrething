@@ -22,5 +22,7 @@ public class RecordTest {
         Hello mm = MapWriter.parse(r.getSource(), Hello.class);
         System.out.println(JSON.toJSONString(mm));
     }
+    
+
 
 }

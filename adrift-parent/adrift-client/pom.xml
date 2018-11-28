@@ -46,7 +46,7 @@
         </dependency>
         <dependency>
             <groupId>com.secrething</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>es-util</artifactId>
             <version>1.0.0</version>
         </dependency>
         <dependency>

@@ -1,5 +1,7 @@
 package com.secrething.esutil.core;
 
+import java.util.Date;
+
 import static org.junit.Assert.*;
 
 /**
@@ -11,6 +13,7 @@ public class RecordTest {
     public void create() {
         Message message = new Message();
         message.setContent("hello");
+        message.setLastModifyTime(new Date());
         Record r = Record.create(message);
         System.out.println(r);
 

@@ -3,6 +3,8 @@ package com.secrething.esutil.core;
 import javassist.*;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -19,7 +21,7 @@ public abstract class MapWriter {
     private static final AtomicLong suffix = new AtomicLong(0);
     private static final ThreadLocal<Exception> localCache = new ThreadLocal<>();
 
-    static MapWriter getWriter(final Class clzz) throws Exception {
+    static MapWriter getWriter(final Class clzz,DateParser parser) throws Exception {
         MapWriter writer = writerCache.computeIfAbsent(clzz, (k) -> {
             try {
                 String clzzName = MapWriter.class.getName() + "$" + idx.getAndIncrement();
@@ -32,12 +34,14 @@ public abstract class MapWriter {
                 CtClass ctClass = classPool.makeClass(clzzName);
                 String objClassName = clzz.getName();
                 ctClass.setSuperclass(classPool.get(MapWriter.class.getName()));
-                StringBuilder toMapBuilder = new StringBuilder("java.util.Map toMap(Object o) throws Exception{");
-                StringBuilder parseBuilder = new StringBuilder("Object parseObject(java.util.Map map) throws Exception{");
+                StringBuilder toMapBuilder = new StringBuilder("java.util.Map toMap(Object o, com.secrething.esutil.core.DateParser p) throws Exception{");
+                StringBuilder parseBuilder = new StringBuilder("Object parseObject(java.util.Map map, com.secrething.esutil.core.DateParser p) throws Exception{");
                 parseBuilder.append(objClassName).append(" obj = new ").append(objClassName).append("();");
                 parseBuilder.append("if(null == map){return obj;}");
+                parseBuilder.append("com.secrething.esutil.core.DateParser parser = p; if(null == parser){parser = com.secrething.esutil.core.DatePaserEnum.LONG;}");
                 toMapBuilder.append("java.util.HashMap m = new java.util.HashMap();");
                 toMapBuilder.append("if(null == o){return m;}");
+                toMapBuilder.append("com.secrething.esutil.core.DateParser parser = p; if(null == parser){parser = com.secrething.esutil.core.DatePaserEnum.LONG;}");
                 toMapBuilder.append("if(o instanceof " + objClassName + "){");
                 toMapBuilder.append(objClassName).append(" obj = (" + objClassName + ")o;");
                 Class foreachClass = clzz;
@@ -46,7 +50,7 @@ public abstract class MapWriter {
                     for (Field f : fields) {
                         f.getModifiers();
                         toMapBuilder.append(buildGet(f, foreachClass));
-                        parseBuilder.append(buildSet(f, foreachClass));
+                        parseBuilder.append(buildSet(f, foreachClass,parser));
                     }
                     foreachClass = foreachClass.getSuperclass();
 
@@ -122,15 +126,27 @@ public abstract class MapWriter {
             put = "Double.valueOf(obj." + methodName + "())";
         } else if (f.getType() == byte.class) {
             put = "Byte.valueOf(obj." + methodName + "())";
+        } else if (f.getType() == Date.class) {
+            put = "parser.format(obj." + methodName + "())";
         }
         return "m.put(\"" + key + "\"," + put + ");";
 
     }
 
-    private static String buildSet(Field f, Class clzz) throws NoSuchMethodException {
+    private static String buildSet(Field f, Class clzz,DateParser parser) throws NoSuchMethodException {
+        if (null == parser)
+            parser = DatePaserEnum.LONG;
         Key e = f.getAnnotation(Key.class);
         if (null == e) {
             return "";
+        }
+        Method[] methods = parser.getClass().getMethods();
+        Method parse =null;
+        for (Method m:methods){
+            if ("parse".equals(m.getName())){
+                parse = m;
+                break;
+            }
         }
         String fName = f.getName();
         String key = fName;
@@ -159,8 +175,15 @@ public abstract class MapWriter {
             setBuilder.append("double v = Double.valueOf(").append(vName).append(".toString()).doubleValue();");
         } else if (f.getType() == byte.class) {
             setBuilder.append("byte v = Byte.valueOf(").append(vName).append(".toString()).byteValue();");
+        } else if (f.getType() == Date.class) {
+            setBuilder.append(parse.getParameterTypes()[0].getName()).append(" vvv=(").append(parse.getParameterTypes()[0].getName()).append(")").append(vName).append(";");
+            setBuilder.append("java.util.Date v = parser.parse(vvv);");
         } else {
-            setBuilder.append(f.getType().getName()).append(" v = (").append(f.getType().getName()).append(")").append(vName).append(";");
+            setBuilder.append(f.getType().getName()).append(" v = (").append(f.getType().getName()).append(")").append(vName);
+            if (f.getType() == String.class) {
+                setBuilder.append(".toString()");
+            }
+            setBuilder.append(";");
         }
         setBuilder.append("obj.").append(methodName).append("(v);");
         setBuilder.append("}\n");
@@ -210,8 +233,12 @@ public abstract class MapWriter {
 
     @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> map(Object o) {
+        return map(o, DatePaserEnum.LONG);
+    }
+
+    public static <K, V> Map<K, V> map(Object o, DateParser parser) {
         try {
-            return MapWriter.getWriter(o.getClass()).toMap(o);
+            return MapWriter.getWriter(o.getClass(),parser).toMap(o, parser);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -219,21 +246,25 @@ public abstract class MapWriter {
     }
 
     public static <T> T parse(Map map, Class<T> clzz) {
+        return parse(map, clzz, DatePaserEnum.LONG);
+    }
+
+    public static <T> T parse(Map map, Class<T> clzz, DateParser parser) {
         try {
-            return MapWriter.getWriter(clzz).toObject(map);
+            return MapWriter.getWriter(clzz,parser).toObject(map, parser);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    abstract Map toMap(Object obj) throws Exception;
+    abstract Map toMap(Object obj, DateParser parser) throws Exception;
 
-    abstract Object parseObject(Map map) throws Exception;
+    abstract Object parseObject(Map map, DateParser parser) throws Exception;
 
     @SuppressWarnings("unchecked")
-    private <T> T toObject(Map map) throws Exception {
-        return (T) parseObject(map);
+    private <T> T toObject(Map map, DateParser parser) throws Exception {
+        return (T) parseObject(map,parser);
 
     }
 
