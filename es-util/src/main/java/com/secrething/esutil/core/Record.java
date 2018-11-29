@@ -42,6 +42,9 @@ public class Record {
     public static Record create(Object obj) {
         return create(obj, null,null);
     }
+    public static Record create(Object obj,String uid) {
+        return create(obj, uid,null);
+    }
     public static Record create(Object obj,DateParser parser) {
         return create(obj, null,parser);
     }

@@ -109,7 +109,7 @@ public class ElasticClientFactory {
             BulkRequest bulkRequest = new BulkRequest();
             for (int i = 0, j = list.size(); i < j; i++) {
                 Message message = MapWriter.parse(list.get(i),Message.class);
-                Record record = Record.create(message,UUIDBuilder.genUUID());
+                Record record = Record.create(message,UUIDBuilder.genUUID(),null);
                 IndexRequest req = new IndexRequest();
                 req.index(record.getIndex());
                 req.type(record.getType());
