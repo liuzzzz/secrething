@@ -14,10 +14,10 @@ public class RecordTest {
         Message message = new Message();
         message.setContent("hello");
         message.setLastModifyTime(new Date());
-        Record r = Record.create(message);
+        Record r = Record.create(message,DatePaserEnum.STRING);
         System.out.println(r);
 
-        Message message1 = MapWriter.parse(r.getSource(),Message.class);
+        Message message1 = MapWriter.parse(r.getSource(),Message.class,DatePaserEnum.LONG);
         System.out.println(message1);
     }
 }

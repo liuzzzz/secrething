@@ -12,7 +12,7 @@ public class Record {
     private Map source;
 
     @SuppressWarnings("unchecked")
-    public static Record create(Object obj, String uid) {
+    public static Record create(Object obj, String uid,DateParser parser) {
         Class clzz = obj.getClass();
         try {
             if (!clzz.isAnnotationPresent(Document.class))
@@ -21,7 +21,7 @@ public class Record {
             Record record = new Record();
             record.setIndex(document.index());
             record.setType(document.type());
-            Map<String, Object> s = MapWriter.map(obj);
+            Map<String, Object> s = MapWriter.map(obj,parser);
             if (null != s) {
                 Object id = s.remove("id");
                 String setId = uid;
@@ -40,7 +40,10 @@ public class Record {
     }
 
     public static Record create(Object obj) {
-        return create(obj, null);
+        return create(obj, null,null);
+    }
+    public static Record create(Object obj,DateParser parser) {
+        return create(obj, null,parser);
     }
 
     public String getIndex() {
