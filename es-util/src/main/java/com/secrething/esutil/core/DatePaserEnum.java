@@ -9,10 +9,12 @@ import java.util.Date;
  */
 public enum DatePaserEnum implements DateParser {
     LONG {
+        @Override
         public Date parse(Object l) {
-            return new Date((Long)l);
+            return new Date((Long) l);
         }
 
+        @Override
         public Long format(Date t) {
             return t.getTime();
         }
@@ -20,6 +22,7 @@ public enum DatePaserEnum implements DateParser {
     STRING {
         private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
+        @Override
         public Date parse(Object l) {
             try {
                 return format.parse((String) l);
@@ -28,6 +31,7 @@ public enum DatePaserEnum implements DateParser {
             }
         }
 
+        @Override
         public String format(Date t) {
             return format.format(t);
         }
