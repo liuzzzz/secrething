@@ -13,5 +13,6 @@
     <modules>
         <module>adrift-client</module>
         <module>adrift-server</module>
+        <module>adrift-search</module>
     </modules>
 </project>
