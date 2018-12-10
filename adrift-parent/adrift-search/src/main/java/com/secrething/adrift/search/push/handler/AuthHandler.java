@@ -1,6 +1,7 @@
 package com.secrething.adrift.search.push.handler;
 
 import com.alibaba.fastjson.JSONObject;
+import com.secrething.adrift.search.core.SearchRequest;
 import com.secrething.adrift.search.push.protocol.Constants;
 import com.secrething.adrift.search.util.NettyUtil;
 import io.netty.channel.Channel;
@@ -12,6 +13,8 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by liuzz on 2018-12-08 15:30.
@@ -60,7 +63,7 @@ public class AuthHandler extends SimpleChannelInboundHandler<Object> {
             handshaker.handshake(ctx.channel(), request);
         }
     }
-
+    public static CountDownLatch l = new CountDownLatch(1);
     private void handleWebSocket(ChannelHandlerContext ctx, WebSocketFrame frame) {
         // 判断是否关闭链路命令
         if (frame instanceof CloseWebSocketFrame) {
@@ -86,8 +89,9 @@ public class AuthHandler extends SimpleChannelInboundHandler<Object> {
             throw new UnsupportedOperationException(frame.getClass().getName() + " frame type not supported");
         }
         String message = ((TextWebSocketFrame) frame).text();
-        JSONObject json = JSONObject.parseObject(message);
-        int code = json.getInteger("code");
+        JSONObject body = JSONObject.parseObject(message);
+        int code = body.getInteger("code");
+        SearchRequest request = JSONObject.parseObject(body.getString("extension"),SearchRequest.class);
         Channel channel = ctx.channel();
         switch (code) {
             case Constants.PING_CODE:
@@ -98,8 +102,11 @@ public class AuthHandler extends SimpleChannelInboundHandler<Object> {
                 return;
             case Constants.SEARCH_CODE:
                 String remoteAddr = NettyUtil.parseChannelRemoteAddr(channel);
-                String searchKey = json.getString(Constants.SEARCH_KEY);
+                String searchKey = request.generatorSearchKey();
                 ChannelHolder.cacheChannel(channel, searchKey, remoteAddr);
+                if (l.getCount() > 0){
+                    l.countDown();
+                }
                 break;
             default:
                 logger.warn("The code [{}] can't be auth!!!", code);
@@ -107,5 +114,8 @@ public class AuthHandler extends SimpleChannelInboundHandler<Object> {
         }
         //后续消息交给MessageHandler处理
         //ctx.fireChannelRead(frame.retain());
+    }
+    public static CountDownLatch getLatch(){
+        return l;
     }
 }

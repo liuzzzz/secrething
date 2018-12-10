@@ -18,7 +18,7 @@ public class MessageBuilder {
         return JSONObject.toJSONString(m);
     }
 
-    public static String buildRoutingsMsg(String searchKey, List<Routing> msg) {
+    public static String buildRoutingsMsg(String searchKey, List<Object> msg) {
         Message m = new Message();
         m.setCode(Constants.SEARCH_CODE);
         m.getExtension().put("code", Constants.SEARCH_CODE);

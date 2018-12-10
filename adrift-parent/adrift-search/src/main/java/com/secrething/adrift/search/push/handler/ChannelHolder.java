@@ -80,7 +80,7 @@ public class ChannelHolder {
      *
      * @param message
      */
-    public static void broadcastMess(String searchKey, List<Routing> message) {
+    public static void broadcastMess(String searchKey, List<Object> message) {
         Optional<ChannelGroup> group = Optional.ofNullable(channelGroup.get(searchKey));
         group.ifPresent((g) -> {
             g.getChannelWrappers().keySet().forEach(w -> {

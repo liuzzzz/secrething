@@ -13,6 +13,7 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +23,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class PushServer extends BaseServer {
     private ScheduledExecutorService executorService;
+    private static final CountDownLatch l = new CountDownLatch(1);
+    public void await(){
+        try {
+            l.await();
+        }catch (Exception e){
 
+        }
+    }
     public PushServer(int port) {
         this.port = port;
         executorService = Executors.newScheduledThreadPool(2);
@@ -64,6 +72,7 @@ public class PushServer extends BaseServer {
             cf = b.bind().sync();
             InetSocketAddress addr = (InetSocketAddress) cf.channel().localAddress();
             logger.info("WebSocketServer start success, port is:{}", addr.getPort());
+            l.countDown();
             cf.channel().closeFuture().addListener((o) -> logger.info("WebSocketServer Close")).sync();
         } catch (InterruptedException e) {
             logger.error("WebSocketServer start fail,", e);

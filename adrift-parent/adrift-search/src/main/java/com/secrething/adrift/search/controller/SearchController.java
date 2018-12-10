@@ -1,16 +1,22 @@
 package com.secrething.adrift.search.controller;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.secrething.adrift.search.core.Holder;
 import com.secrething.adrift.search.core.Routing;
 import com.secrething.adrift.search.core.SearchRequest;
 import com.secrething.adrift.search.core.SearchResponse;
+import com.secrething.adrift.search.push.Bootstrap;
+import com.secrething.adrift.search.push.handler.AuthHandler;
 import com.secrething.adrift.search.push.handler.ChannelHolder;
-import com.secrething.adrift.search.push.protocol.Constants;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -20,63 +26,66 @@ import java.util.concurrent.*;
  */
 @RestController
 public class SearchController {
+    private static final ScheduledExecutorService s = Executors.newScheduledThreadPool(1);
+
+    static {
+        s.schedule(Bootstrap::start, 60, TimeUnit.SECONDS);
+    }
+
     ThreadPoolExecutor executor = new ThreadPoolExecutor(500, 4000, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
 
     @RequestMapping(value = "hello/search", method = {RequestMethod.POST})
-    public SearchResponse search(SearchRequest request) {
+    public Object search(@RequestBody String text) throws InterruptedException {
+        AuthHandler.getLatch().await(20,TimeUnit.SECONDS);
+        final SearchRequest request = JSONObject.parseObject(text, SearchRequest.class);
         SearchResponse response = new SearchResponse();
         final Holder h = new Holder();
-        final String searchKey = generatorSearchKey(request);
+        final String searchKey = request.generatorSearchKey();
         CopyOnWriteArrayList<Routing> routingList = new CopyOnWriteArrayList<>();
-        CountDownLatch latch = new CountDownLatch(20);
-        for (int i = 0; i < 20; i++) {
-            final int n = i;
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
+        CountDownLatch latch = new CountDownLatch(1);
+        JSONObject json = JSONObject.parseObject(getJSON());
+        JSONArray routings = json.getJSONArray("routings");
+        JSONArray ja = new JSONArray();
+        ja.addAll(routings.subList(0, 30));
+        json.put("routings", ja);
+        List<Object> caches = routings.subList(31, routings.size() - 31);
+
+        executor.execute(() -> {
+            int size = caches.size();
+            List<Object> rs = new ArrayList<>();
+            for (int i = size - 1; i >= 0; i--) {
+                rs.add(caches.get(i));
+                if (i % 100 == 0) {
                     try {
-                        TimeUnit.SECONDS.sleep(n + 1);
-                        if (!h.compareAndSet(null, Constants.HOLDER)) {
-                            // TODO search
-                            List<Routing> routings = new ArrayList<>();
-                            ChannelHolder.broadcastMess(searchKey, routings);
-                        }
+                        Thread.sleep(4000);
                     } catch (InterruptedException e) {
-
+                        e.printStackTrace();
                     }
+                    ChannelHolder.broadcastMess(searchKey, rs);
+                    rs = new ArrayList<>();
                 }
-            });
-        }
+            }
+        });
         try {
-            latch.await(5, TimeUnit.SECONDS);
-            h.compareAndSet(null, Constants.HOLDER);
-
-            //TODO merge
+            latch.await(2, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
 
         }
-        return response;
+        response.setRoutings(routingList);
+        return json;
     }
 
 
-    String generatorSearchKey(SearchRequest request) {
-
-        StringBuilder sbff = new StringBuilder();
-        sbff.append(request.getFromCity())
-                .append('_')
-                .append(request.getToCity())
-                .append('|')
-                .append(request.getFromTime());
-        if (StringUtils.isNotBlank(request.getRetTime())) {
-            sbff.append('_').append(request.getRetTime());
+    public static String getJSON() {
+        try {
+            File file = new File("/Users/Idroton/workspace/react/adrift-search/public/search/response.json");
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String json = reader.readLine();
+            reader.close();
+            return json;
+        } catch (Exception e) {
+            return "";
         }
-        sbff.append('|')
-                .append('$')
-                .append(request.getAdtNumber())
-                .append('-')
-                .append(request.getChdNumber())
-                .append('-')
-                .append(request.getInfNumber());
-        return sbff.toString();
+
     }
 }
