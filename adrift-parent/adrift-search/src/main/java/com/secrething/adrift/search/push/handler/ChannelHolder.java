@@ -1,8 +1,8 @@
 package com.secrething.adrift.search.push.handler;
 
-import com.secrething.adrift.search.core.Routing;
 import com.secrething.adrift.search.push.MessageBuilder;
 import com.secrething.adrift.search.push.protocol.Constants;
+import com.secrething.adrift.search.util.GuavaCacheFactory;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.Attribute;
@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
@@ -27,8 +28,8 @@ public class ChannelHolder {
     private static final AttributeKey<String> SEARCH_KEY = AttributeKey.valueOf("search_key");
     private static final AttributeKey<String> REMOTE_ADDRESS = AttributeKey.valueOf("remote_addr");
     private static ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock(true);
-    private static ConcurrentMap<String, ChannelGroup> channelGroup = new ConcurrentHashMap<>();
-    private static ConcurrentMap<Channel, ChannelWrapper> channels = new ConcurrentHashMap<>();
+    private static ConcurrentMap<String, ChannelGroup> channelGroup = GuavaCacheFactory.mapInstance(2000, 10, TimeUnit.SECONDS, -1, null);
+    private static ConcurrentMap<Channel, ChannelWrapper> channels = GuavaCacheFactory.mapInstance(2000, 10, TimeUnit.SECONDS, -1, null);
 
     public static boolean cacheChannel(Channel channel, String searchKey, String remoteAddr) {
         channel.attr(SEARCH_KEY).set(searchKey);
@@ -42,14 +43,11 @@ public class ChannelHolder {
                 channelGroup.put(searchKey, group);
 
             }
-            ChannelWrapper wrapper = channels.get(channel);
-            if (null == wrapper) {
-                wrapper = new ChannelWrapper();
-                wrapper.setChannel(channel);
-                wrapper.setRemoteAddr(remoteAddr);
-                channels.put(channel, wrapper);
-            }
-            group.getChannelWrappers().putIfAbsent(wrapper, Constants.HOLDER);
+            ChannelWrapper wrapper = new ChannelWrapper();
+            wrapper.setChannel(channel);
+            wrapper.setRemoteAddr(remoteAddr);
+            channels.put(channel, wrapper);
+            group.getChannelWrappers().put(wrapper, Constants.HOLDER);
             return true;
         } finally {
             rwLock.writeLock().unlock();
@@ -84,7 +82,8 @@ public class ChannelHolder {
         Optional<ChannelGroup> group = Optional.ofNullable(channelGroup.get(searchKey));
         group.ifPresent((g) -> {
             g.getChannelWrappers().keySet().forEach(w -> {
-                w.getChannel().writeAndFlush(new TextWebSocketFrame(MessageBuilder.buildRoutingsMsg(searchKey, message)));
+                if (w.getChannel().isActive())
+                    w.getChannel().writeAndFlush(new TextWebSocketFrame(MessageBuilder.buildRoutingsMsg(searchKey, message)));
             });
         });
     }

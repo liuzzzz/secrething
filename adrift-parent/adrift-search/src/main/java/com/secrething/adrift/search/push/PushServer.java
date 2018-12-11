@@ -13,6 +13,7 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -42,7 +43,7 @@ public class PushServer extends BaseServer {
         }, 3, 60, TimeUnit.SECONDS);
 
         // 定时向所有客户端发送Ping消息
-        //executorService.scheduleAtFixedRate(() -> ChannelHolder.broadCastPing(), 3, 50, TimeUnit.SECONDS);
+        //executorService.scheduleAtFixedRate(() -> ChannelHolder.broadcastMess("1_1|1_1|$1-0-0",new ArrayList<>()), 3, 3, TimeUnit.SECONDS);
     }
 
     @Override

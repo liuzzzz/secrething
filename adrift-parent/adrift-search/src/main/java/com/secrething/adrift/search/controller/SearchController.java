@@ -27,16 +27,16 @@ import java.util.concurrent.*;
 @RestController
 public class SearchController {
     private static final ScheduledExecutorService s = Executors.newScheduledThreadPool(1);
-
+    private final ConcurrentMap<String,Object> concurrentMap = new ConcurrentHashMap<>();
     static {
-        s.schedule(Bootstrap::start, 60, TimeUnit.SECONDS);
+        s.schedule(Bootstrap::start, 5, TimeUnit.SECONDS);
     }
 
     ThreadPoolExecutor executor = new ThreadPoolExecutor(500, 4000, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
 
-    @RequestMapping(value = "hello/search", method = {RequestMethod.POST})
+    @RequestMapping(value = "hello/search", method = {RequestMethod.POST,RequestMethod.GET})
     public Object search(@RequestBody String text) throws InterruptedException {
-        AuthHandler.getLatch().await(20,TimeUnit.SECONDS);
+        AuthHandler.getLatch().await(10,TimeUnit.SECONDS);
         final SearchRequest request = JSONObject.parseObject(text, SearchRequest.class);
         SearchResponse response = new SearchResponse();
         final Holder h = new Holder();
@@ -48,8 +48,7 @@ public class SearchController {
         JSONArray ja = new JSONArray();
         ja.addAll(routings.subList(0, 30));
         json.put("routings", ja);
-        List<Object> caches = routings.subList(31, routings.size() - 31);
-
+        List<Object> caches = routings.subList(30, routings.size());
         executor.execute(() -> {
             int size = caches.size();
             List<Object> rs = new ArrayList<>();
@@ -57,7 +56,7 @@ public class SearchController {
                 rs.add(caches.get(i));
                 if (i % 100 == 0) {
                     try {
-                        Thread.sleep(4000);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -66,6 +65,7 @@ public class SearchController {
                 }
             }
         });
+
         try {
             latch.await(2, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
@@ -78,7 +78,7 @@ public class SearchController {
 
     public static String getJSON() {
         try {
-            File file = new File("/Users/Idroton/workspace/react/adrift-search/public/search/response.json");
+            File file = new File("/usr/local/Shared/response.json");
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String json = reader.readLine();
             reader.close();
