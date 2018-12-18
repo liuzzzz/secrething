@@ -3,20 +3,20 @@ package com.secrething.common.util;
 import com.alibaba.fastjson.JSON;
 import com.sun.management.GcInfo;
 import org.apache.commons.lang3.StringUtils;
+import sun.jvm.hotspot.runtime.VM;
+import sun.jvm.hotspot.tools.Tool;
 
 import javax.management.Notification;
 import javax.management.NotificationBroadcaster;
-import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * @author liuzz
@@ -79,34 +79,31 @@ public abstract class MesgFormatter {
         @Override
         public void handleNotification(Notification notification, Object handback) {
             System.out.println(JSON.toJSONString(notification));
-            final Object gcbean = handback;
-            GcInfo gcInfo = (GcInfo) AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
-                try {
-                    Method method = gcbean.getClass().getMethod("getLastGcInfo");
-                    method.setAccessible(true);
-                    return method.invoke(gcbean);
-                } catch (Exception e) {
-                    throw new IllegalStateException(e);
-                }
-            });
+            final com.sun.management.GarbageCollectorMXBean gcbean = (com.sun.management.GarbageCollectorMXBean)handback;
+            GcInfo gcInfo = gcbean.getLastGcInfo();
             System.out.println(JSON.toJSONString(gcInfo));
+        }
+    }
+    private static class Test extends Tool{
+
+        @Override
+        public void run() {
+            VM.getVM().registerVMSuspendedObserver((o, arg) -> System.out.println("suspend"));
+        }
+
+        @Override
+        public void execute(String... args) {
+            super.execute(args);
         }
     }
     public static void main(String[] args) throws Exception {
         String pname = ManagementFactory.getRuntimeMXBean().getName();
+        new Test().execute(pname.split("@")[0]);
+        System.out.println(pname);
         List<GarbageCollectorMXBean> list = ManagementFactory.getGarbageCollectorMXBeans();
         for (GarbageCollectorMXBean gcbean: list){
             NotificationBroadcaster broadcaster = (NotificationBroadcaster) gcbean;
             broadcaster.addNotificationListener(new GCListener(),null,gcbean);
-            /*AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
-                try {
-                    Method method = gcbean.getClass().getMethod("addNotificationListener",NotificationListener.class, NotificationFilter.class,Object.class);
-                    method.setAccessible(true);
-                    return method.invoke(gcbean,new GCListener(),null,null);
-                } catch (Exception e) {
-                    throw new IllegalStateException(e);
-                }
-            });*/
         }
         System.out.println(System.currentTimeMillis());
         System.gc();
@@ -126,7 +123,7 @@ public abstract class MesgFormatter {
         });
         t.setDaemon(true);
         t.start();
-        Thread.sleep(100000);
+        Thread.sleep(10000000);
 
     }
     /*private static Object invoke(final Object target, final String methodName, final Class<?>... args) {
