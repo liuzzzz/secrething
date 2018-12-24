@@ -1,5 +1,6 @@
 package com.secrething.common.core;
 
+import com.sun.tools.attach.VirtualMachine;
 import org.junit.Test;
 
 /**
@@ -10,6 +11,6 @@ public class AttachTest {
 
     @Test
     public void test(){
-
+        System.out.println(VirtualMachine.list());
     }
 }

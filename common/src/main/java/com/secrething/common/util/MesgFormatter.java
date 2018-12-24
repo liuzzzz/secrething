@@ -98,16 +98,18 @@ public abstract class MesgFormatter {
     }
     public static void main(String[] args) throws Exception {
         String pname = ManagementFactory.getRuntimeMXBean().getName();
-        new Test().execute(pname.split("@")[0]);
         System.out.println(pname);
         List<GarbageCollectorMXBean> list = ManagementFactory.getGarbageCollectorMXBeans();
-        for (GarbageCollectorMXBean gcbean: list){
+        /*for (GarbageCollectorMXBean gcbean: list){
             NotificationBroadcaster broadcaster = (NotificationBroadcaster) gcbean;
             broadcaster.addNotificationListener(new GCListener(),null,gcbean);
-        }
+        }*/
         System.out.println(System.currentTimeMillis());
         System.gc();
         System.out.println(System.currentTimeMillis());
+        System.gc();
+        System.gc();
+        System.gc();
         Thread.sleep(1000);
         Thread t =  new Thread(() -> {
             try {

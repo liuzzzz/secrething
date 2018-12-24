@@ -1,51 +1,23 @@
 package com.secrething.learn.test;
 
-import java.io.*;
-import java.math.BigInteger;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.usermodel.Range;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.util.Units;
-import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
-import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.apache.poi.xwpf.usermodel.XWPFTable;
-import org.apache.poi.xwpf.usermodel.XWPFTable.XWPFBorderType;
-import org.apache.poi.xwpf.usermodel.XWPFTableCell;
-import org.apache.poi.xwpf.usermodel.XWPFTableCell.XWPFVertAlign;
-import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.junit.Test;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBorder;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblBorders;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STBorder;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth;
+import spock.lang.Specification;
 
-
-import static org.junit.Assert.*;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Idroton on 2018/10/6 2:28 PM.
  */
-public class ByteCodeTestTest {
+public class ByteCodeTestTest extends Specification {
 
     @Test
     public  void writeWordFile() {
@@ -134,6 +106,10 @@ public class ByteCodeTestTest {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Test
+    public void testG(){
     }
 
 }

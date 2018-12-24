@@ -8,5 +8,6 @@ public class AdriftClientApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(AdriftClientApplication.class, args);
+
     }
 }
