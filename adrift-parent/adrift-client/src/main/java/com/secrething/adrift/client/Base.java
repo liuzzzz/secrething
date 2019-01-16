@@ -7,7 +7,7 @@ import com.secrething.esutil.core.Key;
  */
 public class Base {
     @Key("id")
-    private String uid = String.valueOf(System.currentTimeMillis());
+    private String uid = UUIDBuilder.genUUID();
 
     public String getUid() {
         return uid;

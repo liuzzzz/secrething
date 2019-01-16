@@ -56,8 +56,12 @@ public final class IDGenUtil {
             char64Map.put(CHARS_64[i], i);
         }
     }
-
-    private String toSeriaString(long i, int disgit, char[] baseChar, char... pre) {
+    static void checkInputLong(Object num,int idx){
+        if (idx < 0)
+            throw numberTooLong(num);
+    }
+    private String toSeriaString(long in, int disgit, char[] baseChar, char... pre) {
+        long i = in;
         if (disgit <= 0)
             throw disgitTooMin(disgit);
         int radix = baseChar.length;
@@ -68,7 +72,9 @@ public final class IDGenUtil {
             i = -i;
         }
         while (i <= -radix) {
-            buf[charPos--] = baseChar[-(int) (i % radix)];
+            int idx = charPos--;
+            checkInputLong(in,idx);
+            buf[idx] = baseChar[-(int) (i % radix)];
             i = i / radix;
         }
         buf[charPos] = baseChar[(int) -i];
@@ -116,6 +122,7 @@ public final class IDGenUtil {
             i = i.multiply(BigInteger.valueOf(-1));
         }
         while (i.compareTo(radix.multiply(BigInteger.valueOf(-1))) <= 0) {
+            checkInputLong(num,disgit);
             buf[charPos--] = baseChar[(i.multiply(BigInteger.valueOf(-1)).mod(radix).intValue())];
             i = i.divide(radix);
         }
@@ -258,7 +265,7 @@ public final class IDGenUtil {
         return new NumberFormatException("For input string: \"" + s + "\"");
     }
 
-    private static IllegalArgumentException numberTooLong(Number number) {
+    private static IllegalArgumentException numberTooLong(Object number) {
         return new IllegalArgumentException("the number [" + number + "] too long");
     }
 
@@ -301,6 +308,10 @@ public final class IDGenUtil {
 
     private Object readResolve() {
         return Inner.INSTANCE;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getFullInstance().toSeriaString32((long)(1000000000L*(Math.random())),6));
     }
 }
 

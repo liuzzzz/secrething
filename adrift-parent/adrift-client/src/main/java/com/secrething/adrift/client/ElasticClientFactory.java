@@ -6,6 +6,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.secrething.esutil.core.MapWriter;
 import com.secrething.esutil.core.Record;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -19,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -98,35 +100,62 @@ public class ElasticClientFactory {
         testIndex();
     }
 
-    public static void testIndex() throws IOException, InterruptedException {
-        for (int k = 0; k < 9; k++) {
-            File file = new File("/Users/liuzz58/Desktop/logs/msg"+k+".json");
-            BufferedReader fileReader = new BufferedReader(new FileReader(file));
-            String json = fileReader.readLine();
+    public static void testIndex() throws Exception {
+        File file = new File("/Users/liuzz58/Desktop/q/basic.csv");
 
-            List<Map> list = JSONObject.parseArray(json, Map.class);
-            List<Record> records = new ArrayList<>(1000);
-            BulkRequest bulkRequest = new BulkRequest();
-            for (int i = 0, j = list.size(); i < j; i++) {
-                Message message = MapWriter.parse(list.get(i),Message.class);
-                Record record = Record.create(message,UUIDBuilder.genUUID(),null);
-                IndexRequest req = new IndexRequest();
-                req.index(record.getIndex());
-                req.type(record.getType());
-                req.id(record.getId()).source(record.getSource());
-                if (i != 0  && i % 1000 == 0){
-                    BulkResponse insertBuilder1 = client.bulk(bulkRequest);
-                    bulkRequest = new BulkRequest();
-                    bulkRequest.add(req);
-                }else {
-                    bulkRequest.add(req);
+        BufferedReader fileReader = new BufferedReader(new FileReader(file));
+        String line = null;
+        Class<AirQuality> clzz = AirQuality.class;
+        Field[] fields = clzz.getDeclaredFields();
+        List<AirQuality> list = new ArrayList<>();
+        for (int i = 0; (line = fileReader.readLine()) != null; i++) {
+            if (i == 0)
+                continue;
+            String item[] = line.split(",");//CSV格式文件为逗号分隔符文件，这里根据逗号切分
+            AirQuality quality = new AirQuality();
+            for (int j = 0; j <item.length ; j++) {
+                fields[j].setAccessible(true);
+                try {
+                    fields[j].set(quality,Integer.valueOf(item[j]));
+                }catch (Exception e){
+                    try {
+                        fields[j].set(quality,Double.valueOf(item[j]));
+                    }catch (Exception e1){
+                        try {
+                            fields[j].set(quality,item[j]);
+                        }catch (Exception eee){
+
+                        }
+
+                    }
+
                 }
             }
-            if (bulkRequest.numberOfActions() > 0)
-                client.bulk(bulkRequest);
-            System.out.println("Finished:"+k);
+            list.add(quality);
+
         }
 
+
+
+        List<Record> records = new ArrayList<>(1000);
+        BulkRequest bulkRequest = new BulkRequest();
+        for (int i = 0, j = list.size(); i < j; i++) {
+            AirQuality quality = list.get(i);
+            Record record = Record.create(quality, UUIDBuilder.genUUID(), null);
+            IndexRequest req = new IndexRequest();
+            req.index(record.getIndex());
+            req.type(record.getType());
+            req.id(record.getId()).source(record.getSource());
+            if (i != 0 && i % 1000 == 0) {
+                BulkResponse insertBuilder1 = client.bulk(bulkRequest);
+                bulkRequest = new BulkRequest();
+                bulkRequest.add(req);
+            } else {
+                bulkRequest.add(req);
+            }
+        }
+        if (bulkRequest.numberOfActions() > 0)
+            client.bulk(bulkRequest);
         System.exit(1);
     }
 }
