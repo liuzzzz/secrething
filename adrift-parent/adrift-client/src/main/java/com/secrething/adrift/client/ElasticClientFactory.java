@@ -1,13 +1,14 @@
 package com.secrething.adrift.client;
 
 
-import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.secrething.esutil.core.MapWriter;
 import com.secrething.esutil.core.Record;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -23,7 +24,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 public class ElasticClientFactory {
@@ -57,7 +57,10 @@ public class ElasticClientFactory {
                 }
                 return new HttpHost(ipPort[0], Integer.parseInt(ipPort[1]));
             });
-            client = new RestHighLevelClient(RestClient.builder(transform.toArray(new HttpHost[0])));
+            final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(AuthScope.ANY,
+                    new UsernamePasswordCredentials("xiaoq", "hello_xiaoq08"));
+            client = new RestHighLevelClient(RestClient.builder(transform.toArray(new HttpHost[0])).setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)));
             log.info("elas client init success");
         } catch (Exception e) {
             log.error("init elas client is error", e);
@@ -79,6 +82,7 @@ public class ElasticClientFactory {
             if (client != null) {
                 client.close();
             }
+
         } catch (IOException e) {
             log.error("elas client close  error", e);
         }
