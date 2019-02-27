@@ -3,6 +3,8 @@ package com.secrething.adrift.client;
 import com.secrething.esutil.core.Document;
 import com.secrething.esutil.core.Key;
 
+import java.lang.reflect.Method;
+
 /**
  * Created by liuzz on 2018-11-27 13:12.
  */
@@ -98,5 +100,9 @@ public class Message extends Base {
 
     public void setLastModifyTime(String lastModifyTime) {
         this.lastModifyTime = lastModifyTime;
+    }
+
+    public static void main(String[] args) throws NoSuchMethodException {
+        System.out.println(Message.class.getMethod("getLastModifyTime") == Message.class.getMethod("getLastModifyTime"));
     }
 }

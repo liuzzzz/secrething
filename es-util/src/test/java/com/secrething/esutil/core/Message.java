@@ -1,6 +1,10 @@
 package com.secrething.esutil.core;
 
+
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by liuzz on 2018-11-27 13:12.
@@ -26,6 +30,9 @@ public class Message extends Base {
     private String createTime;
     @Key("last_modify_time")
     private Date lastModifyTime;
+
+    private List<JSONObject> list;
+    private List list1;
 
     public long getMsgId() {
         return msgId;
@@ -97,5 +104,13 @@ public class Message extends Base {
 
     public void setLastModifyTime(Date lastModifyTime) {
         this.lastModifyTime = lastModifyTime;
+    }
+
+    public List<JSONObject> getList() {
+        return list;
+    }
+
+    public void setList(List<JSONObject> list) {
+        this.list = list;
     }
 }

@@ -141,11 +141,10 @@ public class ElasticClientFactory {
 
 
 
-        List<Record> records = new ArrayList<>(1000);
         BulkRequest bulkRequest = new BulkRequest();
         for (int i = 0, j = list.size(); i < j; i++) {
             AirQuality quality = list.get(i);
-            Record record = Record.create(quality, UUIDBuilder.genUUID(), null);
+            Record record = Record.create(quality, UUIDBuilder.genUUID());
             IndexRequest req = new IndexRequest();
             req.index(record.getIndex());
             req.type(record.getType());

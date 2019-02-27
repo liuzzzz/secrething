@@ -16,4 +16,17 @@ public class Base {
     public void setUid(String uid) {
         this.uid = uid;
     }
+
+    public static void main(String[] args) {
+        int[] r = {1,2,3,4};
+        int[] s = {1,2,3,4,5,6,7,8};
+        int[] t = {r[0],r[0],r[0],r[0],r[0],r[0],r[0]};
+        for (int i=0;i<t.length;i++){
+            int ti = t[i];
+            for (int j = 0; j <r.length ; j++) {
+                int rj = r[j];
+                
+            }
+        }
+    }
 }
