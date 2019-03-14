@@ -17,7 +17,7 @@ public class Base {
         this.uid = uid;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         int[] r = {1,2,3,4};
         int[] s = {1,2,3,4,5,6,7,8};
         int[] t = {r[0],r[0],r[0],r[0],r[0],r[0],r[0]};

@@ -1,6 +1,7 @@
 package com.secrething.adrift.client;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.secrething.esutil.core.Record;
@@ -12,18 +13,20 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 public class ElasticClientFactory {
@@ -102,44 +105,87 @@ public class ElasticClientFactory {
 
     public static void main(String[] args) throws Exception {
         testIndex();
+        //search(queryBuilder());
+
+
+
+    }
+
+    public static QueryBuilder queryBuilder() {
+        QueryBuilder builder = QueryBuilders.boolQuery().filter(QueryBuilders.termsQuery("sno", new String[]{"S001", "S002"}))
+                .filter(QueryBuilders.rangeQuery("time").gte(20181101).lte(20181130));
+
+        return builder;
+
+    }
+
+    private static final Set<String> s = new HashSet<>();
+        private static final SimpleDateFormat format = new SimpleDateFormat("yyy-MM-dd HH:mm:ss");
+    public static void search(QueryBuilder builder) throws Exception {
+
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.query(builder);
+        sourceBuilder.fetchSource(new String[]{"pm2.5", "pm10"}, null);
+        System.out.println(sourceBuilder.toString());
+        SearchRequest request = new SearchRequest(new String[]{"air_quality"}, sourceBuilder);
+        SearchResponse response = client.search(request);
+        SearchHit[] hits = response.getHits().getHits();
+        for (SearchHit hit : hits) {
+            Map<String, Object> map = hit.getSourceAsMap();
+            System.out.println(JSONObject.toJSONString(map));
+        }
     }
 
     public static void testIndex() throws Exception {
-        File file = new File("/Users/liuzz58/Desktop/q/basic.csv");
-
-        BufferedReader fileReader = new BufferedReader(new FileReader(file));
-        String line = null;
-        Class<AirQuality> clzz = AirQuality.class;
-        Field[] fields = clzz.getDeclaredFields();
+        //File file = new File("/Users/liuzz58/Desktop/q/basic.csv");
+        File f = new File("/Users/liuzz58/Desktop/newdata");
         List<AirQuality> list = new ArrayList<>();
-        for (int i = 0; (line = fileReader.readLine()) != null; i++) {
-            if (i == 0)
-                continue;
-            String item[] = line.split(",");//CSV格式文件为逗号分隔符文件，这里根据逗号切分
-            AirQuality quality = new AirQuality();
-            for (int j = 0; j <item.length ; j++) {
-                fields[j].setAccessible(true);
-                try {
-                    fields[j].set(quality,Integer.valueOf(item[j]));
-                }catch (Exception e){
+        for (File file : f.listFiles()) {
+
+
+            BufferedReader fileReader = new BufferedReader(new InputStreamReader(new FileInputStream(file),"GBK"));
+            String line = null;
+            //Class<AirQuality> clzz = AirQuality.class;
+            //Field[] fields = clzz.getDeclaredFields();
+
+            for (int i = 0; (line = fileReader.readLine()) != null; i++) {
+                if (i == 0)
+                    continue;
+                String item[] = line.split(",");//CSV格式文件为逗号分隔符文件，这里根据逗号切分
+                AirQuality quality = new AirQuality();
+                quality.setStation(item[1]);
+                quality.setAqi(Double.valueOf(item[3]));
+                quality.setSo2(Double.valueOf(item[5]));
+                quality.setCo(Double.valueOf(item[7]));
+                quality.setNo2(Double.valueOf(item[9]));
+                quality.setO3(Double.valueOf(item[11]));
+                quality.setPm10(Double.valueOf(item[13]));
+                quality.setPm2_5(Double.valueOf(item[17]));
+                quality.setPubTime(item[23]);
+                quality.setPubDate(item[23].substring(0,10));
+                quality.setPubTimeLong(format.parse(item[23]).getTime());
+                /*for (int j = 0; j < item.length; j++) {
+                    fields[j].setAccessible(true);
                     try {
-                        fields[j].set(quality,Double.valueOf(item[j]));
-                    }catch (Exception e1){
+                        fields[j].set(quality, Integer.valueOf(item[j]));
+                    } catch (Exception e) {
                         try {
-                            fields[j].set(quality,item[j]);
-                        }catch (Exception eee){
+                            fields[j].set(quality, Double.valueOf(item[j]));
+                        } catch (Exception e1) {
+                            try {
+                                fields[j].set(quality, item[j]);
+                            } catch (Exception eee) {
+
+                            }
 
                         }
 
                     }
+                }*/
+                list.add(quality);
 
-                }
             }
-            list.add(quality);
-
         }
-
-
 
         BulkRequest bulkRequest = new BulkRequest();
         for (int i = 0, j = list.size(); i < j; i++) {
@@ -149,7 +195,7 @@ public class ElasticClientFactory {
             req.index(record.getIndex());
             req.type(record.getType());
             req.id(record.getId()).source(record.getSource());
-            if (i != 0 && i % 1000 == 0) {
+            if (i != 0 && i % 500 == 0) {
                 BulkResponse insertBuilder1 = client.bulk(bulkRequest);
                 bulkRequest = new BulkRequest();
                 bulkRequest.add(req);
@@ -160,5 +206,14 @@ public class ElasticClientFactory {
         if (bulkRequest.numberOfActions() > 0)
             client.bulk(bulkRequest);
         System.exit(1);
+    }
+
+    static {
+        for (int i = 1; i < 10; i++) {
+            s.add("2018-01-0" + i);
+        }
+        for (int i = 10; i < 32; i++) {
+            s.add("2018-01-" + i);
+        }
     }
 }

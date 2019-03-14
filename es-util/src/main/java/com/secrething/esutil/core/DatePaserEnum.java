@@ -20,7 +20,7 @@ public enum DatePaserEnum implements DateParser {
         }
     },
     STRING {
-        private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         @Override
         public Date parse(Object l) {

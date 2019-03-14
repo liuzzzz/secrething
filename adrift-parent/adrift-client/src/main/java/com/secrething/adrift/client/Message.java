@@ -102,7 +102,7 @@ public class Message extends Base {
         this.lastModifyTime = lastModifyTime;
     }
 
-    public static void main(String[] args) throws NoSuchMethodException {
+    public static void main(String[] args) throws Exception {
         System.out.println(Message.class.getMethod("getLastModifyTime") == Message.class.getMethod("getLastModifyTime"));
     }
 }
