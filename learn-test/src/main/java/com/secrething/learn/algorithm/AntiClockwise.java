@@ -45,9 +45,58 @@ public class AntiClockwise {
 
 
     }
+    static void  build_matrix(int n)
+    {
+
+        int[][] arr = new int[n][n];// = (int**)malloc(sizeof(int) * n );
+        int layer = n >> 1;
+        int idx = 0;
+        for(int i = 0 ; i < layer ; i++){
+            int j;
+            // 向右
+            for(j=i; j < (n - i);j++){
+                arr[i][j] = ++idx;
+            }
+            //向下
+            for(j=i+1; j< (n-i); j++){
+                arr[j][n-1-i] = ++idx;
+            }
+
+            //向左
+            for(j=(n-2-i); j >= i; j--){
+                arr[n-1-i][j] = ++idx;
+            }
+
+            //向上
+
+            for(j=(n-2-i); j> i; j--){
+                arr[j][i] = ++idx;
+            }
+            for (int l = 0; l< 6; l++) {
+                for (int m = 0; m < 6; m++) {
+                    System.out.printf("%d \t",arr[l][m]);
+                }
+                System.out.println();
+            }
+        }
+        if ( n % 2 != 0) {
+            arr[layer][layer] = ++idx;
+        }
+
+        for (int i = 0; i< 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                System.out.printf("%d \t",arr[i][j]);
+            }
+            System.out.println();
+        }
+
+
+    }
+
 
     public static void main(String[] args) {
-        int[][] matrix = antiClockwiseMatrix(1,9);
-        Matrix.printMatrix(matrix);
+        //int[][] matrix = antiClockwiseMatrix(1,9);
+        //Matrix.printMatrix(matrix);
+        build_matrix(6);
     }
 }

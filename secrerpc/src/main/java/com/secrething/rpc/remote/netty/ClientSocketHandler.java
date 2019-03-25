@@ -24,9 +24,12 @@ public class ClientSocketHandler extends SimpleChannelInboundHandler<RemoteRespo
         cause.printStackTrace();
 
     }
-
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        ctx.fireChannelRegistered();
+    }
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-
+        ctx.fireChannelActive();
     }
 
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
