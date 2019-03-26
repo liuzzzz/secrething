@@ -30,6 +30,10 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<RemoteReque
         }
 
     }
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        ctx.fireChannelRegistered();
+    }
 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         cause.printStackTrace();
