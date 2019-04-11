@@ -1,8 +1,11 @@
+/*
 import org.junit.Test;
 
+*/
 /**
  * Created by liuzz on 2018-12-19 11:35.
- */
+ *//*
+
 public class Main {
     @Test
     public void start(){
@@ -19,3 +22,4 @@ public class Main {
         }
     }
 }
+*/

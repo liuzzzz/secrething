@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 /**
  * Created by Idroton on 2018/8/11.
@@ -30,10 +31,13 @@ public abstract class NettyServer {
 
     public void start() {
         //暂时只用 nio方式吧
-        ServerBootstrap b = BootstrapFactory.newNioServerBootstrap();
+        final ServerBootstrap b = BootstrapFactory.newServerBootstrap();
         try {
             b.childHandler(new ServerInitializer(getProcessService())).option(ChannelOption.SO_BACKLOG, Integer.valueOf(128)).childOption(ChannelOption.SO_KEEPALIVE, Boolean.valueOf(true));
-            ChannelFuture f = b.bind(InetAddress.getLocalHost(),9999).sync();
+            b .localAddress(new InetSocketAddress(9999));
+            ChannelFuture f = b.bind().sync();
+            InetSocketAddress addr = (InetSocketAddress) f.channel().localAddress();
+            System.out.println(addr.getHostString());
             logger.info("server started !");
             f.channel().closeFuture().sync();
         } catch (Exception e) {
@@ -43,5 +47,9 @@ public abstract class NettyServer {
             b.config().group().shutdownGracefully();
         }
 
+    }
+
+    public static void main(String[] args) {
+        System.out.println();
     }
 }

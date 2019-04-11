@@ -19,7 +19,8 @@ public class BootstrapFactory {
     private BootstrapFactory() {
         throw new UnsupportedOperationException("instance not support");
     }
-
+    private static final String OS_NAME = System.getProperty("os.name").toLowerCase();
+    private static final boolean isLinux = OS_NAME.contains("linux");
     private static final int childThreadsNum = Runtime.getRuntime().availableProcessors() << 1;
     private static AtomicInteger bossNameIdx = new AtomicInteger();
     private static AtomicInteger childNameIdx = new AtomicInteger();
@@ -31,6 +32,22 @@ public class BootstrapFactory {
         Thread t = new Thread(r, String.format("ChildThread-%d", childNameIdx.getAndIncrement()));
         return t;
     };
+    public static ServerBootstrap newServerBootstrap(){
+        System.out.println(OS_NAME);
+        System.out.println(isLinux);
+        if (isLinux)
+            return newEpollServerBootstrap();
+        else
+            return newNioServerBootstrap();
+    }
+    public static Bootstrap newBootstrap(){
+        System.out.println(OS_NAME);
+        System.out.println(isLinux);
+        if (isLinux)
+            return newEpollBootstrap();
+        else
+            return newNioBootstrap();
+    }
 
     public static ServerBootstrap newNioServerBootstrap() {
         ServerBootstrap b = new ServerBootstrap();

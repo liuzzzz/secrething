@@ -3,20 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>secrething</artifactId>
+        <artifactId>secret-test</artifactId>
         <groupId>com.secrething</groupId>
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>secret-test</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>remote</module>
-        <module>service</module>
-        <module>consumer</module>
-    </modules>
-
+    <artifactId>remote</artifactId>
     <dependencies>
         <dependency>
             <groupId>com.secrething</groupId>
@@ -24,4 +17,5 @@
             <version>1.0.0</version>
         </dependency>
     </dependencies>
+
 </project>

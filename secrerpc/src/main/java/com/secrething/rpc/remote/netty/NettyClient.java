@@ -39,7 +39,7 @@ public class NettyClient implements RemoteHandler {
     }
 
     public void open() {
-        bootstrap = BootstrapFactory.newNioBootstrap();
+        bootstrap = BootstrapFactory.newBootstrap();
         bootstrap.handler(new ClientInitializer(new ClientProcessService()))
                 .option(ChannelOption.TCP_NODELAY, true)
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT).option(ChannelOption.SO_KEEPALIVE, Boolean.TRUE);

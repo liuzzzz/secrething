@@ -1,22 +1,6 @@
 package com.secrething.common.util;
 
-import com.alibaba.fastjson.JSON;
-import com.sun.management.GcInfo;
 import org.apache.commons.lang3.StringUtils;
-import sun.jvm.hotspot.runtime.VM;
-import sun.jvm.hotspot.tools.Tool;
-
-import javax.management.Notification;
-import javax.management.NotificationBroadcaster;
-import javax.management.NotificationListener;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.ManagementFactory;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 /**
  * @author liuzz
@@ -74,7 +58,7 @@ public abstract class MesgFormatter {
     public static final void print(String pattern, Object... params) {
         System.out.print(format(pattern, params));
     }
-    private static class GCListener implements NotificationListener {
+    /*private static class GCListener implements NotificationListener {
 
         @Override
         public void handleNotification(Notification notification, Object handback) {
@@ -83,8 +67,8 @@ public abstract class MesgFormatter {
             GcInfo gcInfo = gcbean.getLastGcInfo();
             System.out.println(JSON.toJSONString(gcInfo));
         }
-    }
-    private static class Test extends Tool{
+    }*/
+    /*private static class Test extends Tool{
 
         @Override
         public void run() {
@@ -100,10 +84,10 @@ public abstract class MesgFormatter {
         String pname = ManagementFactory.getRuntimeMXBean().getName();
         System.out.println(pname);
         List<GarbageCollectorMXBean> list = ManagementFactory.getGarbageCollectorMXBeans();
-        /*for (GarbageCollectorMXBean gcbean: list){
+        for (GarbageCollectorMXBean gcbean: list){
             NotificationBroadcaster broadcaster = (NotificationBroadcaster) gcbean;
             broadcaster.addNotificationListener(new GCListener(),null,gcbean);
-        }*/
+        }
         System.out.println(System.currentTimeMillis());
         System.gc();
         System.out.println(System.currentTimeMillis());
@@ -127,7 +111,7 @@ public abstract class MesgFormatter {
         t.start();
         Thread.sleep(10000000);
 
-    }
+    }*/
     /*private static Object invoke(final Object target, final String methodName, final Class<?>... args) {
         return AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {

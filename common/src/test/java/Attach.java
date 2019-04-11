@@ -1,9 +1,12 @@
+/*
 import com.sun.tools.attach.VirtualMachine;
 import org.junit.Test;
 
+*/
 /**
  * Created by liuzz on 2018-12-19 11:36.
- */
+ *//*
+
 public class Attach{
     private static final Object LOCK = new Object();
     public static class MonitorThread extends Thread{
@@ -56,3 +59,4 @@ public class Attach{
 
 
 }
+*/

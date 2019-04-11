@@ -38,15 +38,17 @@ public class RedBlackBST<T> {
         for (int i = 0; i < 32; i++) {
             brt.insert(i);
         }
-        brt.traversing();
+       /* brt.traversing();
         brt.delete(8);
         System.out.println("-------------------");
-        brt.traversing();
+        brt.traversing();*/
 
         /*long begin = System.currentTimeMillis();
         brt.search(brt.root,9999999);
         System.out.println(System.currentTimeMillis() - begin);
         System.out.println(serchCount);*/
+
+        wide(brt.root);
     }
 
     private static boolean colorOf(Node node) {
@@ -470,5 +472,32 @@ public class RedBlackBST<T> {
                 return parent.left;
             }
         }
+    }
+
+    private static void deep(Node node){
+        if (null == node)
+            return;
+        System.out.printf(node.data+"\t");
+        deep(node.left);
+        deep(node.right);
+
+    }
+    private static void wide(Node node){
+        if (null == node)
+            return;
+        LinkedBlockingQueue<Node> queue = new LinkedBlockingQueue<>();
+        queue.offer(node);
+        Node n = queue.poll();
+        while (n != null){
+            System.out.print(n.data+"\t");
+            if (null != n.left)
+                queue.offer(n.left);
+            if (null != n.right){
+                queue.offer(n.right);
+                System.out.println();
+            }
+            n = queue.poll();
+        }
+
     }
 }
