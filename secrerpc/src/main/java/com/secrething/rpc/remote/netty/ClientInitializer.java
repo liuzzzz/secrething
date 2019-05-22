@@ -39,10 +39,10 @@ public class ClientInitializer extends ChannelInitializer<SocketChannel> {
     @Override
     public void initChannel(SocketChannel ch) throws Exception {
         CodecContainer codecContainer = new CodecContainer(new ClientCodec());
-        ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds));
+       // ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds));
         ch.pipeline().addLast("messageEncoder", codecContainer.getEncoder());
         ch.pipeline().addLast("messageDecoder", codecContainer.getDecoder());
-        ch.pipeline().addLast("clientHeartHandler", new ClientHeartHandler());
+        //ch.pipeline().addLast("clientHeartHandler", new ClientHeartHandler());
         ch.pipeline().addLast("clientHandler", new ClientSocketHandler(processService));
     }
 }

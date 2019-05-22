@@ -38,6 +38,7 @@ public class RedBlackBST<T> {
         for (int i = 0; i < 32; i++) {
             brt.insert(i);
         }
+        brt.traversing();
        /* brt.traversing();
         brt.delete(8);
         System.out.println("-------------------");
@@ -48,7 +49,6 @@ public class RedBlackBST<T> {
         System.out.println(System.currentTimeMillis() - begin);
         System.out.println(serchCount);*/
 
-        wide(brt.root);
     }
 
     private static boolean colorOf(Node node) {
@@ -91,13 +91,16 @@ public class RedBlackBST<T> {
     }
 
     public void traversing() {
-
         Queue<Node<T>> queue = new LinkedBlockingQueue<>();
+        Queue<Integer> level = new LinkedBlockingQueue<>();
         queue.add(root);
-        Node<T> prev = null;
+        level.add(0);
+        Integer tmp = 0;
         while (!queue.isEmpty()) {
             Node<T> node = queue.poll();
-            if (null != prev && comparator.compare(prev.data, node.data) < 0) {
+            Integer levelIdx = level.poll();
+            if (!tmp.equals(levelIdx)){
+                tmp = levelIdx;
                 System.out.println();
             }
             if (node.color == RED) {
@@ -106,11 +109,15 @@ public class RedBlackBST<T> {
                 Out.print(node.data);
             }
             Out.print("\t");
-            if (null != leftOf(node))
+            if (null != leftOf(node)){
                 queue.add(node.left);
-            if (null != rightOf(node))
+                level.add(tmp+1);
+            }
+
+            if (null != rightOf(node)){
                 queue.add(node.right);
-            prev = node;
+                level.add(tmp+1);
+            }
         }
     }
 

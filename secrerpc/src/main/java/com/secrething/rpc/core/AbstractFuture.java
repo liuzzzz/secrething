@@ -12,6 +12,7 @@ public abstract class AbstractFuture<T> implements Future<T> {
     private final long beginTime = System.currentTimeMillis();
 
     private T response;
+
     public AbstractFuture() {
         this.sync = new Sync();
     }
@@ -38,15 +39,15 @@ public abstract class AbstractFuture<T> implements Future<T> {
         @Override
         protected boolean tryRelease(int arg) {
             if (PENDING == getState())
-                if (compareAndSetState(PENDING, DONE))
-                    return true;
-            return false;
+                setState(DONE);
+            return true;
         }
 
         private boolean isDone() {
             return getState() == DONE;
         }
     }
+
     public long getBeginTime() {
         return beginTime;
     }
@@ -65,7 +66,7 @@ public abstract class AbstractFuture<T> implements Future<T> {
     @Override
     public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         sync.tryAcquireNanos(-1, unit.toNanos(timeout));
-            return response;
+        return response;
 
     }
 

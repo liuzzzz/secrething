@@ -33,16 +33,12 @@ public class BootstrapFactory {
         return t;
     };
     public static ServerBootstrap newServerBootstrap(){
-        System.out.println(OS_NAME);
-        System.out.println(isLinux);
         if (isLinux)
             return newEpollServerBootstrap();
         else
             return newNioServerBootstrap();
     }
     public static Bootstrap newBootstrap(){
-        System.out.println(OS_NAME);
-        System.out.println(isLinux);
         if (isLinux)
             return newEpollBootstrap();
         else

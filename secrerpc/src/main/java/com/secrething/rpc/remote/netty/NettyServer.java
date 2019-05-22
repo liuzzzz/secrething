@@ -34,10 +34,9 @@ public abstract class NettyServer {
         final ServerBootstrap b = BootstrapFactory.newServerBootstrap();
         try {
             b.childHandler(new ServerInitializer(getProcessService())).option(ChannelOption.SO_BACKLOG, Integer.valueOf(128)).childOption(ChannelOption.SO_KEEPALIVE, Boolean.valueOf(true));
-            b .localAddress(new InetSocketAddress(9999));
+            b.localAddress(new InetSocketAddress(9999));
             ChannelFuture f = b.bind().sync();
             InetSocketAddress addr = (InetSocketAddress) f.channel().localAddress();
-            System.out.println(addr.getHostString());
             logger.info("server started !");
             f.channel().closeFuture().sync();
         } catch (Exception e) {

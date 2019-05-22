@@ -79,7 +79,7 @@ public class NettyClient implements RemoteHandler {
             connect();
             logger.info("connect to server cost ={}", System.currentTimeMillis() - begin);
         }
-        RemoteFuture<RemoteRequest, RemoteResponse> future = new RemoteFuture<>(remoteRequest, () -> this.channel.writeAndFlush(remoteRequest));
+        RemoteFuture<RemoteRequest, RemoteResponse> future = new RemoteFuture<>(remoteRequest, () -> {this.channel.write(remoteRequest);this.channel.write(remoteRequest); this.channel.flush();});
         return future.go();
     }
 

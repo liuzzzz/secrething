@@ -15,6 +15,7 @@ public class ServerCodec implements Codec {
     public void decode(ByteBuf buffer, List<Object> out) throws Exception {
         if (buffer.readableBytes() >= BASE_LENGTH) {
             MessageProtocol protocol = MessageParser.parse(buffer,BASE_LENGTH);
+            System.out.println(protocol);
             if (null != protocol){
                 RemoteRequest remoteRequest = SerializeUtil.deserialize(protocol.getContent(),RemoteRequest.class);
                 out.add(remoteRequest);

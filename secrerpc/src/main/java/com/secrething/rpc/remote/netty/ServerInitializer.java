@@ -44,10 +44,10 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
     @Override
     public void initChannel(SocketChannel ch) throws Exception {
         CodecContainer codecContainer = new CodecContainer(new ServerCodec());
-        ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds));
+        //ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds));
         ch.pipeline().addLast("responseEncoder", codecContainer.getEncoder());
         ch.pipeline().addLast("requestDecoder", codecContainer.getDecoder());
-        ch.pipeline().addLast("readWriteAllListener", new ServerHeartHandler(maxTimeoutTimes));
+        //ch.pipeline().addLast("readWriteAllListener", new ServerHeartHandler(maxTimeoutTimes));
         ch.pipeline().addLast("serverSocketHandler", new ServerSocketHandler(processService));
     }
 }

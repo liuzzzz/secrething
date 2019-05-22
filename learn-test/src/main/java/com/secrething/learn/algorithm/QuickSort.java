@@ -8,13 +8,13 @@ import java.util.Arrays;
  */
 public class QuickSort {
     public static void main(String[] args) {
-        int[] a = {5,6,3,1,911,32,45};
+        int[] a = {5,6,3,1,911,32,32,45,45,45,45};
         quickSort(a,0,a.length-1);
         System.out.println(Arrays.toString(a));
     }
 
     static void quickSort(int[] a,int l,int r){
-        if (l >= r || l < 0 || r >= a.length){
+        if (null == a || a.length < 1 || l >= r || l < 0 || r >= a.length){
             return;
         }
         int key = a[l];

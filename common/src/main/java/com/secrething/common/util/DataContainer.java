@@ -48,9 +48,9 @@ public class DataContainer<K, D> {
     public static final byte CONCURRENT = 2;
     public static final byte GUAVA = 3;
     private final Map<K, DataContainer<K, D>> children;
-    private final GuavaCacheBuilder<K, DataContainer<K, D>> cacheBuilder;
-    private final byte type;
-    private final Sync sync;
+    private final transient GuavaCacheBuilder<K, DataContainer<K, D>> cacheBuilder;
+    private final transient byte type;
+    private final transient Sync sync;
     private D data;
 
     private DataContainer(byte type, D data, GuavaCacheBuilder<K, DataContainer<K, D>> cacheBuilder) {

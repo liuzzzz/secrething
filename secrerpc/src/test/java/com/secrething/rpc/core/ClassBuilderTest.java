@@ -1,5 +1,6 @@
 package com.secrething.rpc.core;
 
+import com.secrething.common.util.Hello;
 import com.secrething.common.util.Out;
 import org.junit.Test;
 
@@ -10,7 +11,7 @@ public class ClassBuilderTest {
 
     @Test
     public void toClass() throws Exception{
-       test1();
+       //test1();
 
 
        /* ClassPool classPool = new ClassPool(null);
@@ -76,5 +77,10 @@ public class ClassBuilderTest {
             super.finalize();
             Out.log("gc###");
         }
+    }
+    @Test
+    public void test2(){
+        Hello.he();
+
     }
 }
