@@ -23,7 +23,7 @@ public class PropUtil {
 
     static {
         try {
-            File f = new File(PropUtil.class.getResource("/").getPath() + "/es.properties");
+            File f = new File(PropUtil.class.getResource("/").getPath() + "/application.properties");
             InputStream is = new FileInputStream(f);
             p.load(is);
             is.close();
