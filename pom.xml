@@ -35,7 +35,7 @@
         <commons-degester.version>1.8</commons-degester.version>
         <easymoc.version>3.5.1</easymoc.version>
         <elasticsearch.version>6.2.0</elasticsearch.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <email.version>1.6.0</email.version>
         <cfx.version>3.1.0</cfx.version>
         <axis.version>1.4</axis.version>
